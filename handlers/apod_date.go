@@ -15,15 +15,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetApodDate retorna um APOD específico por data
-// @Summary Obtém um APOD por data específica
-// @Description Retorna a imagem astronômica do dia para a data especificada
+// GetApodDate returns a specific APOD by date
+// @Summary Gets an APOD by specific date
+// @Description Returns the astronomy picture of the day for the specified date
 // @Tags APOD
 // @Accept json
 // @Produce json
-// @Param date path string true "Data no formato YYYY-MM-DD" example("2023-01-15")
+// @Param date path string true "Date in YYYY-MM-DD format" example("2023-01-15")
 // @Success 200 {object} Apod
-// @Failure 400 {object} map[string]interface{} "Erro ao obter APOD"
+// @Failure 400 {object} map[string]interface{} "Error getting APOD"
 // @Router /apod/{date} [get]
 func GetApodDate(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -34,26 +34,26 @@ func GetApodDate(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Chave de cache específica para a data
+	// Cache key specific for the date
 	cacheKey := "apod:date:" + date
 
-	// Tenta recuperar do cache primeiro
+	// Try to retrieve from cache first
 	found, err := cache.Get(ctx, cacheKey, &apod)
 	if err != nil {
-		// Erro ao acessar o cache, apenas registra e continua
-		log.Printf("Erro ao acessar cache: %v", err)
+		// Error accessing cache, just log and continue
+		log.Printf("Error accessing cache: %v", err)
 	}
-	// Se encontrou no cache, aplica tradução e retorna
+	// If found in cache, apply translation and return
 	if found {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cache", "HIT")
 
-		// Obtém o idioma da requisição
+		// Get the language from the request
 		lang := middleware.GetLanguageFromContext(r.Context())
 
-		// Se não for inglês, tenta traduzir
+		// If not English, try to translate
 		if lang != "en" {
-			// Converte para map para permitir tradução
+			// Convert to map to allow translation
 			apodMap := map[string]interface{}{
 				"_id":             apod.ID,
 				"date":            apod.Date,
@@ -65,23 +65,23 @@ func GetApodDate(w http.ResponseWriter, r *http.Request) {
 				"url":             apod.Url,
 			}
 
-			// Traduz os campos necessários
+			// Translate the necessary fields
 			if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-				log.Printf("Erro ao traduzir APOD: %v", err)
+				log.Printf("Error translating APOD: %v", err)
 			}
 
-			// Envia a versão traduzida
+			// Send the translated version
 			json.NewEncoder(w).Encode(apodMap)
 		} else {
-			// Sem tradução, envia original
+			// No translation, send original
 			json.NewEncoder(w).Encode(apod)
 		}
 		return
 	}
 
-	// Filtro: buscar documento com campo "date" igual ao parâmetro recebido
+	// Filter: search for document with "date" field equal to the received parameter
 	filter := bson.M{"date": date}
-	// Se não encontrou no cache, busca no banco de dados
+	// If not found in cache, search in the database
 	err = database.ApodCollection.FindOne(ctx, filter).Decode(&apod)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -93,20 +93,20 @@ func GetApodDate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Se encontrou no banco de dados, armazena no cache para futuras requisições
-	// APODs históricos nunca mudam, então podemos usar uma expiração longa (30 dias)
+	// If found in the database, store in cache for future requests
+	// Historical APODs never change, so we can use a long expiration (30 days)
 	if cacheErr := cache.Set(ctx, cacheKey, apod, 30*24*time.Hour); cacheErr != nil {
-		log.Printf("Erro ao armazenar no cache: %v", cacheErr)
+		log.Printf("Error storing in cache: %v", cacheErr)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Cache", "MISS") // Indica que veio do banco, não do cache
+	w.Header().Set("X-Cache", "MISS") // Indicates it came from the database, not from cache
 
-	// Obtém o idioma da requisição
+	// Get the language from the request
 	lang := middleware.GetLanguageFromContext(r.Context())
 
-	// Se não for inglês, tenta traduzir
+	// If not English, try to translate
 	if lang != "en" {
-		// Converte para map para permitir tradução
+		// Convert to map to allow translation
 		apodMap := map[string]interface{}{
 			"_id":             apod.ID,
 			"date":            apod.Date,
@@ -118,15 +118,15 @@ func GetApodDate(w http.ResponseWriter, r *http.Request) {
 			"url":             apod.Url,
 		}
 
-		// Traduz os campos necessários
+		// Translate the necessary fields
 		if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-			log.Printf("Erro ao traduzir APOD: %v", err)
+			log.Printf("Error translating APOD: %v", err)
 		}
 
-		// Envia a versão traduzida
+		// Send the translated version
 		json.NewEncoder(w).Encode(apodMap)
 	} else {
-		// Sem tradução, envia original
+		// No translation, send original
 		json.NewEncoder(w).Encode(apod)
 	}
 }

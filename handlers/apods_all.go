@@ -14,9 +14,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetAllApods retorna todos os APODs no banco de dados
-// @Summary Obtém todos os APODs
-// @Description Retorna todas as imagens astronômicas do dia cadastradas
+// GetAllApods returns all APODs in the database
+// @Summary Get all APODs
+// @Description Returns all registered Astronomy Pictures of the Day
 // @Tags APODs
 // @Accept json
 // @Produce json
@@ -65,28 +65,26 @@ func GetAllApods(w http.ResponseWriter, r *http.Request) {
 
 	var response AllApodsResponse
 	response.Count = len(apods)
-
 	if len(apods) == 1 {
-		response.Apods = []Apod{apods[0]} // um único objeto como slice
+		response.Apods = []Apod{apods[0]} // single object as a slice
 	} else {
-		response.Apods = apods // array de objetos
+		response.Apods = apods // array of objects
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Size", fmt.Sprintf("%d", len(apods)))
-
-	// Obtém o idioma da requisição
+	// Get language from the request
 	lang := middleware.GetLanguageFromContext(r.Context())
 
-	// Se não for inglês, tenta traduzir cada APOD no resultado
+	// If not English, try to translate each APOD in the result
 	if lang != "en" {
-		// Cria uma resposta traduzida
+		// Create a translated response
 		var translatedResponse AllApodsResponse
 		translatedResponse.Count = response.Count
 		translatedApods := make([]map[string]interface{}, 0, len(response.Apods))
 
-		// Traduz cada APOD
+		// Translate each APOD
 		for _, apod := range response.Apods {
-			// Converte para map para permitir tradução
+			// Convert to map to allow translation
 			apodMap := map[string]interface{}{
 				"_id":             apod.ID,
 				"date":            apod.Date,
@@ -98,24 +96,24 @@ func GetAllApods(w http.ResponseWriter, r *http.Request) {
 				"url":             apod.Url,
 			}
 
-			// Traduz os campos necessários
+			// Translate the necessary fields
 			if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-				log.Printf("Erro ao traduzir APOD: %v", err)
+				log.Printf("Error translating APOD: %v", err)
 			}
 
 			translatedApods = append(translatedApods, apodMap)
 		}
 
-		// Cria uma resposta personalizada
+		// Create a custom response
 		customResponse := map[string]interface{}{
 			"count": translatedResponse.Count,
 			"apods": translatedApods,
 		}
 
-		// Envia a versão traduzida
+		// Send the translated version
 		json.NewEncoder(w).Encode(customResponse)
 	} else {
-		// Sem tradução, envia original
+		// No translation, send original
 		json.NewEncoder(w).Encode(response)
 	}
 }

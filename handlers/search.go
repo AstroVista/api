@@ -21,47 +21,47 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// SearchResponse está definido em models.go
+// SearchResponse defined in models.go
 
-// Função para procurar APODs com vários filtros e paginação
-// @Summary Pesquisa avançada de APODs
-// @Description Busca APODs com filtros, paginação e ordenação
+// Function to search APODs with various filters and pagination
+// @Summary Advanced APOD search
+// @Description Search APODs with filters, pagination and sorting
 // @Tags APODs
 // @Accept json
 // @Produce json
-// @Param page query int false "Número da página" example(1) minimum(1)
-// @Param perPage query int false "Itens por página (1-200)" example(20) minimum(1) maximum(200)
-// @Param mediaType query string false "Tipo de mídia (image, video ou any)" example(image) Enums(image, video, any)
-// @Param search query string false "Texto para busca em título e explicação" example(nebulosa)
-// @Param startDate query string false "Data inicial (formato YYYY-MM-DD)" example(2023-01-01)
-// @Param endDate query string false "Data final (formato YYYY-MM-DD)" example(2023-01-31)
-// @Param sort query string false "Ordenação (asc ou desc)" example(desc) Enums(asc, desc)
+// @Param page query int false "Page number" example(1) minimum(1)
+// @Param perPage query int false "Items per page (1-200)" example(20) minimum(1) maximum(200)
+// @Param mediaType query string false "Media type (image, video or any)" example(image) Enums(image, video, any)
+// @Param search query string false "Text to search in title and explanation" example(nebula)
+// @Param startDate query string false "Start date (YYYY-MM-DD format)" example(2023-01-01)
+// @Param endDate query string false "End date (YYYY-MM-DD format)" example(2023-01-31)
+// @Param sort query string false "Sort order (asc or desc)" example(desc) Enums(asc, desc)
 // @Success 200 {object} SearchResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /apods/search [get]
 func SearchApods(w http.ResponseWriter, r *http.Request) {
-	// Cria uma chave de cache a partir da query string completa
+	// Create a cache key from the complete query string
 	queryHash := md5.Sum([]byte(r.URL.RawQuery))
 	cacheKey := "search:" + hex.EncodeToString(queryHash[:])
 
-	// Tenta recuperar resultados do cache
+	// Try to retrieve results from cache
 	var cachedResponse SearchResponse
 	found, err := cache.Get(r.Context(), cacheKey, &cachedResponse)
 	if err != nil {
-		log.Printf("Erro ao acessar cache para busca: %v", err)
+		log.Printf("Error accessing cache for search: %v", err)
 	}
-	// Se encontrou no cache, retorna imediatamente
+	// If found in cache, return immediately
 	if found {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cache", "HIT")
 
-		// Obtém o idioma da requisição
+		// Get language from request
 		lang := middleware.GetLanguageFromContext(r.Context())
 
-		// Se não for inglês, tenta traduzir cada APOD no resultado
+		// If not English, try to translate each APOD in the result
 		if lang != "en" {
-			// Cria uma resposta traduzida
+			// Create a translated response
 			translatedResponse := SearchResponse{
 				TotalResults: cachedResponse.TotalResults,
 				Page:         cachedResponse.Page,
@@ -71,9 +71,9 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 
 			translatedApods := make([]map[string]interface{}, 0, len(cachedResponse.Results))
 
-			// Traduz cada APOD
+			// Translate each APOD
 			for _, apod := range cachedResponse.Results {
-				// Converte para map para permitir tradução
+				// Convert to map to allow translation
 				apodMap := map[string]interface{}{
 					"_id":             apod.ID,
 					"date":            apod.Date,
@@ -85,13 +85,13 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 					"url":             apod.Url,
 				}
 
-				// Traduz os campos necessários
+				// Translate the necessary fields
 				if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-					log.Printf("Erro ao traduzir APOD: %v", err)
+					log.Printf("Error translating APOD: %v", err)
 				}
 
 				translatedApods = append(translatedApods, apodMap)
-			}			// Cria uma resposta personalizada com campos padronizados
+			} // Create a custom response with standardized fields
 			customResponse := map[string]interface{}{
 				"total_results": translatedResponse.TotalResults,
 				"page":          translatedResponse.Page,
@@ -100,55 +100,55 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 				"results":       translatedApods,
 			}
 
-			// Envia a versão traduzida
+			// Send the translated version
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(customResponse)
 		} else {
-			// Sem tradução, envia original
+			// No translation, send original
 			json.NewEncoder(w).Encode(cachedResponse)
 		}
 		return
 	}
 
-	// Obtém os parâmetros da query string
+	// Get parameters from query string
 	query := r.URL.Query()
-	// Paginação (padrões: página 1, 20 itens por página)
+	// Pagination (defaults: page 1, 20 items per page)
 	page, err := strconv.Atoi(query.Get("page"))
 	if err != nil {
 		if query.Get("page") != "" {
-			fmt.Printf("Valor inválido para page ignorado: %s (usando 1 como padrão)\n", query.Get("page"))
+			fmt.Printf("Invalid value for page ignored: %s (using 1 as default)\n", query.Get("page"))
 		}
 		page = 1
 	} else if page < 1 {
-		fmt.Printf("Valor inválido para page (menor que 1): %d (usando 1 como padrão)\n", page)
+		fmt.Printf("Invalid value for page (less than 1): %d (using 1 as default)\n", page)
 		page = 1
 	}
 	perPage, err := strconv.Atoi(query.Get("perPage"))
 	if err != nil {
 		if query.Get("perPage") != "" {
-			fmt.Printf("Valor inválido para perPage ignorado: %s (usando 20 como padrão)\n", query.Get("perPage"))
+			fmt.Printf("Invalid value for perPage ignored: %s (using 20 as default)\n", query.Get("perPage"))
 		}
-		perPage = 20 // Limite padrão
+		perPage = 20 // Default limit
 	} else if perPage < 1 || perPage > 200 {
-		fmt.Printf("Valor fora dos limites para perPage: %d (deve estar entre 1 e 200, usando 20 como padrão)\n", perPage)
-		perPage = 20 // Limite padrão
+		fmt.Printf("Value out of bounds for perPage: %d (must be between 1 and 200, using 20 as default)\n", perPage)
+		perPage = 20 // Default limit
 	}
-	// Construção do filtro MongoDB
+	// Building the MongoDB filter
 	filter := bson.M{}
-	// Filtros diversos - valida que mediaType seja apenas "image" ou "video"
+	// Various filters - validates that mediaType is only "image" or "video"
 	if mediaType := query.Get("mediaType"); mediaType != "" && mediaType != "any" {
-		// Verifica se o valor pertence ao enum permitido
+		// Checks if the value belongs to the allowed enum
 		if mediaType == "image" || mediaType == "video" {
 			filter["media_type"] = mediaType
 		} else {
-			// Se valor inválido, ignora o filtro (como se não tivesse sido fornecido)
-			fmt.Printf("Valor inválido para mediaType ignorado: %s\n", mediaType)
+			// If invalid value, ignore the filter (as if it was not provided)
+			fmt.Printf("Invalid value for mediaType ignored: %s\n", mediaType)
 		}
 	}
 
-	// Pesquisa por texto (em título e explicação)
+	// Text search (in title and explanation)
 	if search := query.Get("search"); search != "" {
-		// Pesquisa texto em múltiplos campos
+		// Text search in multiple fields
 		textFilter := bson.M{
 			"$or": []bson.M{
 				{"title": bson.M{"$regex": search, "$options": "i"}},
@@ -156,7 +156,7 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		// Se já existem outros filtros, combina com eles
+		// If there are already other filters, combine with them
 		if len(filter) > 0 {
 			filter = bson.M{
 				"$and": []bson.M{
@@ -168,7 +168,7 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 			filter = textFilter
 		}
 	}
-	// Filtro por data
+	// Date filter
 	if startDate := query.Get("startDate"); startDate != "" {
 		if _, err := time.Parse("2006-01-02", startDate); err == nil {
 			if endDate := query.Get("endDate"); endDate != "" {
@@ -178,41 +178,41 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 						"$lte": endDate,
 					}
 				} else {
-					// Formato de data inválido para endDate
-					fmt.Printf("Formato de data inválido para endDate ignorado: %s\n", endDate)
+					// Invalid date format for endDate
+					fmt.Printf("Invalid date format for endDate ignored: %s\n", endDate)
 				}
 			} else {
 				filter["date"] = bson.M{"$gte": startDate}
 			}
 		} else {
-			// Formato de data inválido para startDate
-			fmt.Printf("Formato de data inválido para startDate ignorado: %s\n", startDate)
+			// Invalid date format for startDate
+			fmt.Printf("Invalid date format for startDate ignored: %s\n", startDate)
 		}
 	} else if endDate := query.Get("endDate"); endDate != "" {
 		if _, err := time.Parse("2006-01-02", endDate); err == nil {
 			filter["date"] = bson.M{"$lte": endDate}
 		} else {
-			// Formato de data inválido para endDate
-			fmt.Printf("Formato de data inválido para endDate ignorado: %s\n", endDate)
+			// Invalid date format for endDate
+			fmt.Printf("Invalid date format for endDate ignored: %s\n", endDate)
 		}
 	}
-	// Ordenação (padrão: data decrescente / mais recente primeiro)
+	// Sorting (default: descending date / most recent first)
 	sortDirection := -1 // -1 = desc, 1 = asc
 	if sort := query.Get("sort"); sort != "" {
-		// Transforma para minúsculo para comparação case-insensitive
+		// Converts to lowercase for case-insensitive comparison
 		sortLower := strings.ToLower(sort)
-		// Valida se é um valor permitido
+		// Validates if it's an allowed value
 		if sortLower == "asc" {
 			sortDirection = 1
 		} else if sortLower == "desc" {
-			sortDirection = -1 // mantém o padrão
+			sortDirection = -1 // keeps the default
 		} else {
-			// Ignora valor inválido e mantém o padrão
-			fmt.Printf("Valor inválido para sort ignorado: %s (usando 'desc' como padrão)\n", sort)
+			// Ignores invalid value and keeps the default
+			fmt.Printf("Invalid value for sort ignored: %s (using 'desc' as default)\n", sort)
 		}
 	}
 
-	// Configuração da ordenação e paginação
+	// Setting up sorting and pagination
 	findOptions := options.Find().
 		SetSort(bson.D{{Key: "date", Value: sortDirection}}).
 		SetSkip(int64((page - 1) * perPage)).
@@ -221,7 +221,7 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	// Primeiro, contamos o total de documentos para calcular a paginação
+	// First, count the total number of documents to calculate pagination
 	totalResults, err := database.ApodCollection.CountDocuments(ctx, filter)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -233,7 +233,7 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Em seguida, buscamos os documentos da página atual
+	// Next, fetch the documents of the current page
 	cursor, err := database.ApodCollection.Find(ctx, filter, findOptions)
 	if err != nil {
 		fmt.Printf("MongoDB search error: %v\n", err)
@@ -247,7 +247,7 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 	}
 	defer cursor.Close(ctx)
 
-	// Decodifica os resultados
+	// Decodes the results
 	var apods []Apod
 	if err = cursor.All(ctx, &apods); err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -258,11 +258,11 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	// Verifica se foram encontrados resultados
+	// Checks if any results were found
 	if len(apods) == 0 && page == 1 {
-		// Log para depuração mostrando os filtros usados
+		// Debug log showing the filters used
 		filterJSON, _ := json.Marshal(filter)
-		fmt.Printf("Nenhum resultado encontrado para filtro: %s\n", string(filterJSON))
+		fmt.Printf("No results found for filter: %s\n", string(filterJSON))
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
@@ -272,35 +272,34 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Calcula o número total de páginas
+	// Calculates the total number of pages
 	totalPages := int(math.Ceil(float64(totalResults) / float64(perPage)))
 
-	// Prepara a resposta
+	// Prepares the response
 	response := SearchResponse{
 		TotalResults: int(totalResults),
 		Page:         page,
 		PerPage:      perPage,
 		TotalPages:   totalPages,
 		Results:      apods,
-	}
-	// Armazena a resposta no cache com expiração de 5 minutos
+	} // Stores the response in the cache with an expiration of 5 minutes
 	if err := cache.Set(r.Context(), cacheKey, response, 5*time.Minute); err != nil {
-		log.Printf("Erro ao armazenar no cache: %v", err)
+		log.Printf("Error storing in cache: %v", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Cache", "MISS")
 
-	// Obtém o idioma da requisição
+	// Get language from request
 	lang := middleware.GetLanguageFromContext(r.Context())
 
-	// Se não for inglês, tenta traduzir cada APOD no resultado
+	// If not English, try to translate each APOD in the result
 	if lang != "en" {
 		translatedApods := make([]map[string]interface{}, 0, len(response.Results))
 
-		// Traduz cada APOD
+		// Translate each APOD
 		for _, apod := range response.Results {
-			// Converte para map para permitir tradução
+			// Convert to map to allow translation
 			apodMap := map[string]interface{}{
 				"_id":             apod.ID,
 				"date":            apod.Date,
@@ -312,15 +311,15 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 				"url":             apod.Url,
 			}
 
-			// Traduz os campos necessários
+			// Translate the necessary fields
 			if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-				log.Printf("Erro ao traduzir APOD: %v", err)
+				log.Printf("Error translating APOD: %v", err)
 			}
 
 			translatedApods = append(translatedApods, apodMap)
 		}
 
-		// Cria uma resposta personalizada
+		// Create a custom response
 		customResponse := map[string]interface{}{
 			"totalResults": response.TotalResults,
 			"page":         response.Page,
@@ -329,10 +328,10 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 			"results":      translatedApods,
 		}
 
-		// Envia a versão traduzida
+		// Send the translated version
 		json.NewEncoder(w).Encode(customResponse)
 	} else {
-		// Sem tradução, envia original
+		// No translation, send original
 		json.NewEncoder(w).Encode(response)
 	}
 }

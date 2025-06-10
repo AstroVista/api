@@ -15,14 +15,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetApodsDateRange retorna os APODs dentro de um intervalo de datas
-// @Summary Obtém APODs por intervalo de datas
-// @Description Retorna as imagens astronômicas do dia dentro de um intervalo de datas especificado
+// GetApodsDateRange returns APODs within a date range
+// @Summary Get APODs by date range
+// @Description Returns the Astronomy Pictures of the Day within a specified date range
 // @Tags APODs
 // @Accept json
 // @Produce json
-// @Param start query string false "Data de início (formato YYYY-MM-DD)" example("2023-01-01")
-// @Param end query string false "Data de fim (formato YYYY-MM-DD)" example("2023-01-31")
+// @Param start query string false "Start date (YYYY-MM-DD format)" example("2023-01-01")
+// @Param end query string false "End date (YYYY-MM-DD format)" example("2023-01-31")
 // @Success 200 {object} ApodsDateRangeResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
@@ -30,39 +30,38 @@ import (
 func GetApodsDateRange(w http.ResponseWriter, r *http.Request) {
 	startDate := r.URL.Query().Get("start")
 	endDate := r.URL.Query().Get("end")
-
-	// Se o parâmetro "end" não for passado, usa a data atual
+	// If "end" parameter is not provided, use the current date
 	if endDate == "" {
 		endDate = time.Now().Format("2006-01-02")
 	}
 
-	// Gera uma chave de cache com base nos parâmetros da consulta
+	// Generate a cache key based on the query parameters
 	cacheKey := fmt.Sprintf("apods:range:%s:%s", startDate, endDate)
 
-	// Tenta recuperar do cache
+	// Try to retrieve from cache
 	var cachedResponse ApodsDateRangeResponse
 	found, err := cache.Get(context.Background(), cacheKey, &cachedResponse)
 	if err != nil {
-		log.Printf("Erro ao acessar cache para intervalo de datas: %v", err)
+		log.Printf("Error accessing cache for date range: %v", err)
 	}
-	// Se encontrou no cache, retorna imediatamente
+	// If found in cache, return immediately
 	if found {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cache", "HIT")
 
-		// Obtém o idioma da requisição
+		// Get language from request
 		lang := middleware.GetLanguageFromContext(r.Context())
 
-		// Se não for inglês, tenta traduzir cada APOD no resultado
+		// If not English, try to translate each APOD in the result
 		if lang != "en" {
-			// Cria uma resposta traduzida
+			// Create a translated response
 			var translatedResponse ApodsDateRangeResponse
 			translatedResponse.Count = cachedResponse.Count
 			translatedApods := make([]map[string]interface{}, 0, len(cachedResponse.Apods))
 
-			// Traduz cada APOD
+			// Translate each APOD
 			for _, apod := range cachedResponse.Apods {
-				// Converte para map para permitir tradução
+				// Convert to map to allow translation
 				apodMap := map[string]interface{}{
 					"_id":             apod.ID,
 					"date":            apod.Date,
@@ -74,24 +73,24 @@ func GetApodsDateRange(w http.ResponseWriter, r *http.Request) {
 					"url":             apod.Url,
 				}
 
-				// Traduz os campos necessários
+				// Translate the necessary fields
 				if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-					log.Printf("Erro ao traduzir APOD: %v", err)
+					log.Printf("Error translating APOD: %v", err)
 				}
 
 				translatedApods = append(translatedApods, apodMap)
 			}
 
-			// Cria uma resposta personalizada
+			// Create a custom response
 			customResponse := map[string]interface{}{
 				"count": translatedResponse.Count,
 				"apods": translatedApods,
 			}
 
-			// Envia a versão traduzida
+			// Send the translated version
 			json.NewEncoder(w).Encode(customResponse)
 		} else {
-			// Sem tradução, envia original
+			// No translation, send original
 			json.NewEncoder(w).Encode(cachedResponse)
 		}
 		return
@@ -114,8 +113,7 @@ func GetApodsDateRange(w http.ResponseWriter, r *http.Request) {
 			"$lte": endDate,
 		},
 	}
-
-	// Se ambos os parâmetros estiverem vazios, retorna todos os documentos
+	// If both parameters are empty, return all documents
 	if startDate == "" && endDate == "" {
 		filter = bson.M{}
 	}
@@ -160,36 +158,34 @@ func GetApodsDateRange(w http.ResponseWriter, r *http.Request) {
 
 	var response ApodsDateRangeResponse
 	response.Count = len(apods)
-
 	if len(apods) == 1 {
-		response.Apods = []Apod{apods[0]} // um único objeto como slice
+		response.Apods = []Apod{apods[0]} // single object as a slice
 	} else {
-		response.Apods = apods // array de objetos
+		response.Apods = apods // array of objects
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Size", fmt.Sprintf("%d", len(apods)))
-	w.Header().Set("X-Cache", "MISS") // Indica que veio do banco, não do cache
+	w.Header().Set("X-Cache", "MISS") // Indicates that it came from the database, not from cache
 
-	// Armazena no cache para consultas futuras
-	// Intervalos de datas específicos podem ser armazenados por um tempo maior (12 horas)
+	// Store in cache for future queries
+	// Specific date ranges can be stored for a longer time (12 hours)
 	if cacheErr := cache.Set(context.Background(), cacheKey, response, 12*time.Hour); cacheErr != nil {
-		log.Printf("Erro ao armazenar intervalo de datas no cache: %v", cacheErr)
+		log.Printf("Error storing date range in cache: %v", cacheErr)
 	}
 
-	// Obtém o idioma da requisição
+	// Get language from the request
 	lang := middleware.GetLanguageFromContext(r.Context())
 
-	// Se não for inglês, tenta traduzir cada APOD no resultado
+	// If not English, try to translate each APOD in the result
 	if lang != "en" {
-		// Cria uma resposta traduzida
+		// Create a translated response
 		var translatedResponse ApodsDateRangeResponse
 		translatedResponse.Count = response.Count
 		translatedApods := make([]map[string]interface{}, 0, len(response.Apods))
 
-		// Traduz cada APOD
+		// Translate each APOD
 		for _, apod := range response.Apods {
-			// Converte para map para permitir tradução
+			// Convert to map to allow translation
 			apodMap := map[string]interface{}{
 				"_id":             apod.ID,
 				"date":            apod.Date,
@@ -201,24 +197,24 @@ func GetApodsDateRange(w http.ResponseWriter, r *http.Request) {
 				"url":             apod.Url,
 			}
 
-			// Traduz os campos necessários
+			// Translate the necessary fields
 			if err := i18n.TranslateAPOD(apodMap, lang); err != nil {
-				log.Printf("Erro ao traduzir APOD: %v", err)
+				log.Printf("Error translating APOD: %v", err)
 			}
 
 			translatedApods = append(translatedApods, apodMap)
 		}
 
-		// Cria uma resposta personalizada
+		// Create a custom response
 		customResponse := map[string]interface{}{
 			"count": translatedResponse.Count,
 			"apods": translatedApods,
 		}
 
-		// Envia a versão traduzida
+		// Send the translated version
 		json.NewEncoder(w).Encode(customResponse)
 	} else {
-		// Sem tradução, envia original
+		// No translation, send original
 		json.NewEncoder(w).Encode(response)
 	}
 }

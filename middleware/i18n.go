@@ -10,7 +10,8 @@ import (
 type langKey struct{}
 
 // LanguageDetector is a middleware that detects the user's preferred language
-func LanguageDetector(next http.Handler) http.Handler {	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func LanguageDetector(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get language from Accept-Language header
 		acceptLang := r.Header.Get("Accept-Language")
 

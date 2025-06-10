@@ -6,41 +6,41 @@ import (
 	"time"
 )
 
-// TranslationCache implementa um cache em memória para traduções
-// para reduzir requisições à API de tradução
+// TranslationCache implements an in-memory cache for translations
+// to reduce requests to the translation API
 type TranslationCache struct {
 	translations map[string]cacheEntry
 	mutex        sync.RWMutex
 	maxSize      int
 	expiration   time.Duration
-	// Funções opcionais para integração com Redis
+	// Optional functions for Redis integration
 	redisEnabled bool
 }
 
-// cacheEntry representa uma entrada no cache com informações de expiração
+// cacheEntry represents a cache entry with expiration information
 type cacheEntry struct {
 	value      string
 	expiration time.Time
 }
 
-// NewTranslationCache cria uma nova instância do cache de traduções
+// NewTranslationCache creates a new instance of the translation cache
 func NewTranslationCache() *TranslationCache {
 	return &TranslationCache{
 		translations: make(map[string]cacheEntry),
-		maxSize:      1000,           // Limita o número máximo de entradas
-		expiration:   24 * time.Hour, // Tempo padrão de expiração
-		redisEnabled: false,          // Por padrão, não usa Redis
+		maxSize:      1000,           // Limits the maximum number of entries
+		expiration:   24 * time.Hour, // Default expiration time
+		redisEnabled: false,          // By default, does not use Redis
 	}
 }
 
-// EnableRedisCache configura o cache para usar também o Redis
+// EnableRedisCache configures the cache to also use Redis
 func (c *TranslationCache) EnableRedisCache() {
 	c.redisEnabled = cache.Client != nil
 }
 
-// Get recupera uma tradução do cache
+// Get retrieves a translation from the cache
 func (c *TranslationCache) Get(key string) (string, bool) {
-	// Se Redis estiver habilitado, tenta buscar do cache Redis primeiro
+	// If Redis is enabled, try to fetch from Redis cache first
 	if c.redisEnabled && cache.Client != nil {
 		redisCache := NewRedisTranslationCache()
 		if value, found := redisCache.Get(key); found {
@@ -48,7 +48,7 @@ func (c *TranslationCache) Get(key string) (string, bool) {
 		}
 	}
 
-	// Caso contrário, usa o cache em memória
+	// Otherwise, use the in-memory cache
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
@@ -57,29 +57,29 @@ func (c *TranslationCache) Get(key string) (string, bool) {
 		return "", false
 	}
 
-	// Verifica se a entrada expirou
+	// Check if the entry has expired
 	if time.Now().After(entry.expiration) {
-		// Poderia fazer a remoção aqui, mas para evitar
-		// lock upgrading, deixamos para o processo de limpeza periódica
+		// Could do the removal here, but to avoid
+		// lock upgrading, we leave it to the periodic cleanup process
 		return "", false
 	}
 
 	return entry.value, true
 }
 
-// Set armazena uma tradução no cache
+// Set stores a translation in the cache
 func (c *TranslationCache) Set(key string, value string) {
-	// Se Redis estiver habilitado, armazena também no Redis
+	// If Redis is enabled, also store in Redis
 	if c.redisEnabled && cache.Client != nil {
 		redisCache := NewRedisTranslationCache()
 		redisCache.Set(key, value)
 	}
 
-	// Também armazena no cache em memória para acesso rápido
+	// Also store in the in-memory cache for quick access
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	// Se o cache estiver cheio e a chave não existir, fazemos uma limpeza
+	// If the cache is full and the key doesn't exist, do a cleanup
 	if len(c.translations) >= c.maxSize && c.translations[key].value == "" {
 		c.cleanupLocked()
 	}
@@ -90,7 +90,7 @@ func (c *TranslationCache) Set(key string, value string) {
 	}
 }
 
-// Clear limpa todo o cache
+// Clear clears the entire cache
 func (c *TranslationCache) Clear() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -98,21 +98,21 @@ func (c *TranslationCache) Clear() {
 	c.translations = make(map[string]cacheEntry)
 }
 
-// cleanupLocked remove entradas expiradas do cache (assume que o lock já está obtido)
+// cleanupLocked removes expired entries from the cache (assumes the lock is already obtained)
 func (c *TranslationCache) cleanupLocked() {
 	now := time.Now()
 
-	// Remove entradas expiradas
+	// Remove expired entries
 	for key, entry := range c.translations {
 		if now.After(entry.expiration) {
 			delete(c.translations, key)
 		}
 	}
 
-	// Se ainda estiver muito grande, remove as mais antigas
-	// Esta é uma implementação simples, não é LRU completo
+	// If it's still too large, remove the oldest ones
+	// This is a simple implementation, not a complete LRU
 	if len(c.translations) >= c.maxSize {
-		// Removemos cerca de 25% do cache para não ter que fazer isso frequentemente
+		// We remove about 25% of the cache to avoid doing this frequently
 		toRemove := c.maxSize / 4
 		removed := 0
 

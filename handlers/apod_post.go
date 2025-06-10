@@ -15,20 +15,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// PostApod busca o APOD mais recente da API da NASA e o adiciona ao banco de dados
-// @Summary Adiciona novo APOD da NASA
-// @Description Busca na API da NASA o APOD mais recente e adiciona ao banco de dados
+// PostApod fetches the most recent APOD from NASA API and adds it to the database
+// @Summary Adds new APOD from NASA
+// @Description Fetches the most recent APOD from NASA API and adds it to the database
 // @Tags APOD
 // @Accept json
 // @Produce json
-// @Param X-API-Token header string true "Token de API interno"
+// @Param X-API-Token header string true "Internal API token"
 // @Success 201 {object} map[string]interface{}
 // @Failure 401 {object} map[string]string
 // @Failure 409 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /apod [post]
 func PostApod(w http.ResponseWriter, r *http.Request) {
-	// Verifica token básico de API (para serviço interno/agendado)
+	// Verify basic API token (for internal/scheduled service)
 	apiToken := r.Header.Get("X-API-Token")
 	if apiToken != os.Getenv("INTERNAL_API_TOKEN") {
 		w.Header().Set("Content-Type", "application/json")
@@ -39,16 +39,16 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Obtém a chave da API NASA das variáveis de ambiente
+	// Get NASA API key from environment variables
 	nasaAPIKey := os.Getenv("NASA_API_KEY")
 	if nasaAPIKey == "" {
-		nasaAPIKey = "DEMO_KEY" // Chave de demonstração (limite de uso baixo)
+		nasaAPIKey = "DEMO_KEY" // Demo key (limited usage)
 	}
 
-	// URL da API NASA APOD
+	// NASA APOD API URL
 	nasaURL := fmt.Sprintf("https://api.nasa.gov/planetary/apod?api_key=%s", nasaAPIKey)
 
-	// Faz a requisição para a API da NASA
+	// Make request to NASA API
 	resp, err := http.Get(nasaURL)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -61,7 +61,7 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Verifica se a resposta foi bem-sucedida
+	// Check if the response was successful
 	if resp.StatusCode != http.StatusOK {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -72,7 +72,7 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Decodifica a resposta JSON
+	// Decode JSON response
 	var apod Apod
 	if err := json.NewDecoder(resp.Body).Decode(&apod); err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -84,15 +84,15 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Cria um contexto com timeout para operações no MongoDB
+	// Create context with timeout for MongoDB operations
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Verifica se já existe um documento com essa data
+	// Check if a document with this date already exists
 	filter := bson.M{"date": apod.Date}
 	existingApod := database.ApodCollection.FindOne(ctx, filter)
 
-	// Se não houve erro, significa que já existe um documento com essa data
+	// If there was no error, it means a document with this date already exists
 	if existingApod.Err() == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusConflict) // 409 Conflict
@@ -102,7 +102,7 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	} else if existingApod.Err() != mongo.ErrNoDocuments {
-		// Se o erro for diferente de ErrNoDocuments, houve um problema no banco
+		// If the error is different from ErrNoDocuments, there was a database problem
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -112,7 +112,7 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insere o novo documento
+	// Insert the new document
 	result, err := database.ApodCollection.InsertOne(ctx, apod)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -123,19 +123,19 @@ func PostApod(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	// Invalidar cache relacionado
-	// 1. Remove o APOD mais recente do cache
+	// Invalidate related cache
+	// 1. Remove the most recent APOD from cache
 	if err := cache.Delete(ctx, "apod:latest"); err != nil {
-		log.Printf("Erro ao invalidar cache do APOD mais recente: %v", err)
+		log.Printf("Error invalidating cache for the most recent APOD: %v", err)
 	}
 
-	// 2. Remove qualquer cache específico para essa data
+	// 2. Remove any specific cache for this date
 	cacheKey := "apod:date:" + apod.Date
 	if err := cache.Delete(ctx, cacheKey); err != nil {
-		log.Printf("Erro ao invalidar cache para data %s: %v", apod.Date, err)
+		log.Printf("Error invalidating cache for date %s: %v", apod.Date, err)
 	}
 
-	// Retorna sucesso com o ID inserido
+	// Return success with the inserted ID
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) // 201 Created
 	json.NewEncoder(w).Encode(map[string]interface{}{

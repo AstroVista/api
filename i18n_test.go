@@ -9,22 +9,22 @@ import (
 	"testing"
 )
 
-// TestTranslationMiddleware verifica se o middleware de detecção de idioma funciona corretamente
+// TestTranslationMiddleware verifies if the language detection middleware works correctly
 func TestTranslationMiddleware(t *testing.T) {
-	// Inicializa o sistema i18n
+	// Initialize i18n system
 	i18n.InitLocales()
 
-	// Cria um handler de teste que simplesmente retorna o idioma detectado
+	// Create a test handler that simply returns the detected language
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		lang := middleware.GetLanguageFromContext(r.Context())
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"detectedLanguage": lang})
 	})
 
-	// Aplica o middleware
+	// Apply the middleware
 	handlerWithMiddleware := middleware.LanguageDetector(testHandler)
 
-	// Testes para diferentes métodos de detecção de idioma
+	// Tests for different language detection methods
 	testCases := []struct {
 		name           string
 		acceptLanguage string
@@ -91,19 +91,19 @@ func TestTranslationMiddleware(t *testing.T) {
 			}
 
 			if response["detectedLanguage"] != tc.expected {
-				t.Errorf("Idioma esperado %q, obtido %q", tc.expected, response["detectedLanguage"])
+				t.Errorf("Expected language %q, got %q", tc.expected, response["detectedLanguage"])
 			}
 		})
 	}
 }
 
-// TestTranslateAPOD testa a tradução de dados do APOD
+// TestTranslateAPOD tests the translation of APOD data
 func TestTranslateAPOD(t *testing.T) {
-	// Inicializa o sistema i18n
+	// Initialize i18n system
 	i18n.InitLocales()
 	i18n.InitTranslationService()
 
-	// Cria um APOD de teste
+	// Create a test APOD
 	apodData := map[string]interface{}{
 		"title":       "The Milky Way over the Grand Canyon",
 		"explanation": "This is a stunning view of our galaxy spanning over the Grand Canyon.",
@@ -112,42 +112,42 @@ func TestTranslateAPOD(t *testing.T) {
 		"url":         "https://example.com/image.jpg",
 	}
 
-	// Testa a tradução para diferentes idiomas
+	// Test translation for different languages
 	languages := []string{"pt-BR", "es", "fr"}
 
 	for _, lang := range languages {
-		t.Run("Tradução para "+lang, func(t *testing.T) {
-			// Cria uma cópia dos dados para não afetar os testes subsequentes
+		t.Run("Translation to "+lang, func(t *testing.T) {
+			// Create a copy of the data to not affect subsequent tests
 			apodCopy := make(map[string]interface{})
 			for k, v := range apodData {
 				apodCopy[k] = v
 			}
 
-			// Aplica a tradução
+			// Apply the translation
 			err := i18n.TranslateAPOD(apodCopy, lang)
 			if err != nil {
-				t.Fatalf("Erro ao traduzir APOD: %v", err)
+				t.Fatalf("Error translating APOD: %v", err)
 			}
 
-			// Verifica se os campos foram traduzidos
+			// Check if fields were translated
 			origTitle := apodData["title"].(string)
 			transTitle := apodCopy["title"].(string)
 
 			if transTitle == origTitle {
-				t.Logf("Aviso: título não foi alterado. Isso é esperado se não houver API de tradução configurada.")
+				t.Logf("Warning: title was not changed. This is expected if no translation API is configured.")
 			} else {
-				t.Logf("Título original: %q", origTitle)
-				t.Logf("Título traduzido: %q", transTitle)
+				t.Logf("Original title: %q", origTitle)
+				t.Logf("Translated title: %q", transTitle)
 			}
 
 			origExplanation := apodData["explanation"].(string)
 			transExplanation := apodCopy["explanation"].(string)
 
 			if transExplanation == origExplanation {
-				t.Logf("Aviso: explicação não foi alterada. Isso é esperado se não houver API de tradução configurada.")
+				t.Logf("Warning: explanation was not changed. This is expected if no translation API is configured.")
 			} else {
-				t.Logf("Primeiros 50 caracteres da explicação original: %q", origExplanation[:min(50, len(origExplanation))])
-				t.Logf("Primeiros 50 caracteres da explicação traduzida: %q", transExplanation[:min(50, len(transExplanation))])
+				t.Logf("First 50 characters of original explanation: %q", origExplanation[:min(50, len(origExplanation))])
+				t.Logf("First 50 characters of translated explanation: %q", transExplanation[:min(50, len(transExplanation))])
 			}
 		})
 	}

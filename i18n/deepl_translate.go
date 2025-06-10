@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// DeepLTranslateRequest representa o formato de requisição para a API DeepL
+// DeepLTranslateRequest represents the request format for the DeepL API
 type DeepLTranslateRequest struct {
 	Text       []string `json:"text"`
 	SourceLang string   `json:"source_lang,omitempty"`
@@ -18,24 +18,24 @@ type DeepLTranslateRequest struct {
 	Formality  string   `json:"formality,omitempty"`
 }
 
-// DeepLTranslateResponse representa a resposta da API DeepL
+// DeepLTranslateResponse represents the response from the DeepL API
 type DeepLTranslateResponse struct {
 	Translations []struct {
 		Text string `json:"text"`
 	} `json:"translations"`
 }
 
-// DeepLClient implementa o serviço de tradução usando a API DeepL
+// DeepLClient implements the translation service using the DeepL API
 type DeepLClient struct {
 	apiKey     string
 	httpClient *http.Client
 	cache      *TranslationCache
-	freeAPI    bool // Indica se está usando a API gratuita ou Pro
+	freeAPI    bool // Indicates whether using the free API or Pro
 }
 
-// NewDeepLClient cria um novo cliente para a API DeepL
+// NewDeepLClient creates a new client for the DeepL API
 func NewDeepLClient(apiKey string) *DeepLClient {
-	// DeepL distingue API gratuita e Pro pelo prefixo da chave
+	// DeepL distinguishes between free and Pro API by the key prefix
 	isFreeAPI := strings.HasPrefix(apiKey, "DeepL-Auth-Key ")
 
 	return &DeepLClient{
@@ -48,96 +48,94 @@ func NewDeepLClient(apiKey string) *DeepLClient {
 	}
 }
 
-// Translate implementa a interface TranslationService para DeepL
+// Translate implements the TranslationService interface for DeepL
 func (c *DeepLClient) Translate(text, sourceLang, targetLang string) (string, error) {
-	// Verificar no cache primeiro
+	// Check the cache first
 	cacheKey := fmt.Sprintf("deepl:%s:%s:%s", sourceLang, targetLang, getHashKey(text))
 	if cachedText, found := c.cache.Get(cacheKey); found {
 		return cachedText, nil
 	}
 
-	// Adapta o código de idioma para o formato esperado pelo DeepL
+	// Adapt the language code to the format expected by DeepL
 	targetLang = adaptLanguageForDeepL(targetLang)
 
-	// Prepara a requisição
+	// Prepare the request
 	reqBody := DeepLTranslateRequest{
 		Text:       []string{text},
 		TargetLang: targetLang,
 	}
 
-	// Apenas define o idioma de origem se for especificado
+	// Only define the source language if specified
 	if sourceLang != "" {
 		reqBody.SourceLang = adaptLanguageForDeepL(sourceLang)
 	}
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("erro ao serializar requisição: %v", err)
+		return "", fmt.Errorf("error serializing request: %v", err)
 	}
 
-	// URL da API dependendo do tipo (Free ou Pro)
+	// API URL depending on the type (Free or Pro)
 	var url string
 	if c.freeAPI {
 		url = "https://api-free.deepl.com/v2/translate"
 	} else {
 		url = "https://api.deepl.com/v2/translate"
 	}
-
-	// Cria a requisição HTTP
+	// Create the HTTP request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return "", fmt.Errorf("erro ao criar requisição: %v", err)
+		return "", fmt.Errorf("error creating request: %v", err)
 	}
 
-	// Define os headers
+	// Set the headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", c.apiKey)
 
-	// Executa a requisição
+	// Execute the request
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("erro ao executar requisição: %v", err)
+		return "", fmt.Errorf("error executing request: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// Verifica o status da resposta
+	// Check the response status
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API retornou status não-OK: %d", resp.StatusCode)
+		return "", fmt.Errorf("API returned non-OK status: %d", resp.StatusCode)
 	}
 
-	// Decodifica a resposta
+	// Decode the response
 	var translateResp DeepLTranslateResponse
 	if err := json.NewDecoder(resp.Body).Decode(&translateResp); err != nil {
-		return "", fmt.Errorf("erro ao decodificar resposta: %v", err)
+		return "", fmt.Errorf("error decoding response: %v", err)
 	}
 
-	// Verifica se há traduções
+	// Check if there are translations
 	if len(translateResp.Translations) == 0 {
-		return "", fmt.Errorf("nenhuma tradução retornada")
+		return "", fmt.Errorf("no translation returned")
 	}
-
-	// Obtém o texto traduzido
+	// Get the translated text
 	translatedText := translateResp.Translations[0].Text
 
-	// Armazena no cache
+	// Store in cache
 	c.cache.Set(cacheKey, translatedText)
 
 	return translatedText, nil
 }
 
-// adaptLanguageForDeepL converte códigos de idioma para o formato esperado pelo DeepL
+// adaptLanguageForDeepL converts language codes to the format expected by DeepL
 func adaptLanguageForDeepL(lang string) string {
-	// DeepL usa códigos como "PT-BR", "EN-US" (maiúsculos)
+	// DeepL uses codes like "PT-BR", "EN-US" (uppercase)
 	parts := strings.Split(lang, "-")
 	if len(parts) == 1 {
 		return strings.ToUpper(parts[0])
 	}
 
-	// Para códigos compostos, capitaliza ambas as partes
+	// For compound codes, capitalize both parts
 	return strings.ToUpper(parts[0]) + "-" + strings.ToUpper(parts[1])
 }
 
-// DeepLAPIKey retorna a chave da API DeepL do ambiente
+// DeepLAPIKey returns the DeepL API key from the environment
 func DeepLAPIKey() string {
 	return os.Getenv("DEEPL_API_KEY")
 }

@@ -8,26 +8,26 @@ import (
 	"time"
 )
 
-// RedisTranslationCache implementa um cache de traduções usando Redis
-// para persistir traduções entre reinicializações do servidor
+// RedisTranslationCache implements a translation cache using Redis
+// to persist translations between server restarts
 type RedisTranslationCache struct {
-	// Prefixo para evitar colisões com outras chaves no Redis
+	// Prefix to avoid collisions with other keys in Redis
 	prefix string
-	// Tempo de expiração para traduções armazenadas
+	// Expiration time for stored translations
 	expiration time.Duration
 }
 
-// NewRedisTranslationCache cria uma nova instância do cache Redis para traduções
+// NewRedisTranslationCache creates a new instance of Redis cache for translations
 func NewRedisTranslationCache() *RedisTranslationCache {
 	return &RedisTranslationCache{
 		prefix:     "translation:",
-		expiration: 30 * 24 * time.Hour, // 30 dias de cache
+		expiration: 30 * 24 * time.Hour, // 30 days cache
 	}
 }
 
-// Get recupera uma tradução do cache Redis
+// Get retrieves a translation from Redis cache
 func (c *RedisTranslationCache) Get(key string) (string, bool) {
-	// Se Redis não está configurado, retorna não encontrado
+	// If Redis is not configured, return not found
 	if cache.Client == nil {
 		return "", false
 	}
@@ -38,16 +38,16 @@ func (c *RedisTranslationCache) Get(key string) (string, bool) {
 	var result string
 	found, err := cache.Get(ctx, redisKey, &result)
 	if err != nil {
-		log.Printf("Erro ao acessar cache Redis para tradução: %v", err)
+		log.Printf("Error accessing Redis cache for translation: %v", err)
 		return "", false
 	}
 
 	return result, found
 }
 
-// Set armazena uma tradução no cache Redis
+// Set stores a translation in Redis cache
 func (c *RedisTranslationCache) Set(key string, value string) {
-	// Se Redis não está configurado, não faz nada
+	// If Redis is not configured, do nothing
 	if cache.Client == nil {
 		return
 	}
@@ -56,29 +56,29 @@ func (c *RedisTranslationCache) Set(key string, value string) {
 	redisKey := c.prefix + key
 
 	if err := cache.Set(ctx, redisKey, value, c.expiration); err != nil {
-		log.Printf("Erro ao armazenar tradução no cache Redis: %v", err)
+		log.Printf("Error storing translation in Redis cache: %v", err)
 	}
 }
 
-// Clear remove todas as traduções do cache Redis com o prefixo especificado
+// Clear removes all translations from Redis cache with the specified prefix
 func (c *RedisTranslationCache) Clear() {
-	// Se Redis não está configurado, não faz nada
+	// If Redis is not configured, do nothing
 	if cache.Client == nil {
 		return
 	}
 
 	ctx := context.Background()
-	// Usa o comando KEYS para encontrar todas as chaves com o prefixo (menos eficiente mas mais simples)
+	// Uses the KEYS command to find all keys with the prefix (less efficient but simpler)
 	pattern := fmt.Sprintf("%s*", c.prefix)
 	keys, err := cache.Client.Keys(ctx, pattern).Result()
 	if err != nil {
-		log.Printf("Erro ao buscar chaves de tradução no Redis: %v", err)
+		log.Printf("Error fetching translation keys from Redis: %v", err)
 		return
 	}
 
 	if len(keys) > 0 {
 		if err := cache.Client.Del(ctx, keys...).Err(); err != nil {
-			log.Printf("Erro ao deletar chaves de tradução do Redis: %v", err)
+			log.Printf("Error deleting translation keys from Redis: %v", err)
 		}
 	}
 }

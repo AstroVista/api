@@ -29,10 +29,10 @@ func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get the client's IP (or you can use a custom identifier)
 		ip := r.RemoteAddr
-
 		// Check if the IP is within the rate limits
 		if !rl.isAllowed(ip) {
-			w.Header().Set("Content-Type", "application/json")			w.Header().Set("Retry-After", "60")       // Suggest trying again after 60 seconds
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Retry-After", "60")       // Suggest trying again after 60 seconds
 			w.WriteHeader(http.StatusTooManyRequests) // 429 Too Many Requests
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Rate limit exceeded. Please try again later.",

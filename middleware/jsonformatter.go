@@ -37,7 +37,7 @@ func JSONFormatterMiddleware(next http.Handler) http.Handler {
 
 		if isJSON && buffer.Len() > 0 {
 			var data interface{}
-			
+
 			// Try to decode JSON from buffer
 			if err := json.Unmarshal(buffer.Bytes(), &data); err == nil {
 				// Reencode with pretty formatting
@@ -49,14 +49,14 @@ func JSONFormatterMiddleware(next http.Handler) http.Handler {
 					}
 					// Write content length header
 					w.Header().Set("Content-Length", strconv.Itoa(len(formattedJSON)))
-					
+
 					// Write formatted JSON
 					w.Write(formattedJSON)
 					return
 				}
 			}
 		}
-		
+
 		// If not JSON or can't format, write original buffer
 		w.Write(buffer.Bytes())
 	})

@@ -13,7 +13,7 @@ import (
 
 var ApodCollection *mongo.Collection
 
-func Connect() {	// Load environment variables
+func Connect() { // Load environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file - using system environment variables")

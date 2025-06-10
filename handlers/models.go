@@ -6,81 +6,81 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Apod representa um registro de APOD da NASA
+// Apod represents an APOD record from NASA
 // swagger:model Apod
 type Apod struct {
-	// ID do MongoDB
+	// MongoDB ID
 	// example: 507f1f77bcf86cd799439011
 	ID primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	// Data no formato string (ex: "1995-06-16")
+	// Date in string format (e.g. "1995-06-16")
 	// example: 2023-01-15
 	// format: date
 	Date string `bson:"date" json:"date"`
-	// Explicação da imagem astronômica do dia
-	// example: Uma bela nebulosa capturada pelo telescópio Hubble
+	// Explanation of the astronomy picture of the day
+	// example: A beautiful nebula captured by the Hubble telescope
 	Explanation string `bson:"explanation" json:"explanation"`
-	// URL da imagem em alta definição
+	// URL of the high-definition image
 	// example: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg
 	// format: uri
 	Hdurl string `bson:"hdurl" json:"hdurl"`
-	// Tipo de mídia (imagem ou vídeo)
+	// Media type (image or video)
 	// example: image
 	// enum: image,video
 	MediaType string `bson:"media_type" json:"media_type"`
-	// Versão do serviço da API
+	// API service version
 	// example: v1
 	ServiceVersion string `bson:"service_version" json:"service_version"`
-	// Título da imagem astronômica do dia
-	// example: Galáxia de Andrômeda
+	// Title of the astronomy picture of the day
+	// example: Andromeda Galaxy
 	Title string `bson:"title" json:"title"`
-	// URL da imagem em resolução padrão
+	// URL of the standard resolution image
 	// example: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg
 	// format: uri
 	Url string `bson:"url" json:"url"`
 }
 
-// AllApodsResponse é a estrutura de resposta para endpoints que retornam múltiplos APODs
+// AllApodsResponse is the response structure for endpoints that return multiple APODs
 // swagger:model AllApodsResponse
 type AllApodsResponse struct {
-	// Número total de APODs encontrados
+	// Total number of APODs found
 	// example: 15
 	Count int `json:"count"`
-	// Lista de APODs
+	// List of APODs
 	Apods []Apod `json:"apods"`
 }
 
-// ApodsDateRangeResponse é a estrutura de resposta para pesquisa por intervalo de datas
+// ApodsDateRangeResponse is the response structure for date range search
 // swagger:model ApodsDateRangeResponse
 type ApodsDateRangeResponse struct {
-	// Número total de APODs encontrados
+	// Total number of APODs found
 	// example: 7
 	Count int `json:"count"`
-	// Lista de APODs
+	// List of APODs
 	Apods []Apod `json:"apods"`
 }
 
-// SearchResponse é a estrutura de resposta para o endpoint de pesquisa
+// SearchResponse is the response structure for the search endpoint
 // swagger:model SearchResponse
 type SearchResponse struct {
-	// Número total de resultados encontrados
+	// Total number of results found
 	// example: 42
-	TotalResults int `json:"total_results"` // Usando snake_case para consistência
-	// Número da página atual
+	TotalResults int `json:"total_results"` // Using snake_case for consistency
+	// Current page number
 	// example: 1
 	Page int `json:"page"`
-	// Itens por página
+	// Items per page
 	// example: 20
-	PerPage int `json:"per_page"` // Usando snake_case para consistência
-	// Total de páginas disponíveis
+	PerPage int `json:"per_page"` // Using snake_case for consistency
+	// Total number of available pages
 	// example: 3
-	TotalPages int `json:"total_pages"` // Usando snake_case para consistência
-	// Resultados da busca
+	TotalPages int `json:"total_pages"` // Using snake_case for consistency
+	// Search results
 	Results []Apod `json:"results"`
 }
 
-// MarshalJSON customiza a serialização JSON para suportar tradução
+// MarshalJSON customizes JSON serialization to support translation
 func (a Apod) MarshalJSON() ([]byte, error) {
-	// Cria um map com os campos do APOD
+	// Create a map with the APOD fields
 	apodMap := map[string]interface{}{
 		"_id":             a.ID,
 		"date":            a.Date,
@@ -92,8 +92,8 @@ func (a Apod) MarshalJSON() ([]byte, error) {
 		"url":             a.Url,
 	}
 
-	// Na serialização padrão não fazemos nada
-	// A tradução será aplicada nos handlers antes de chamar json.Marshal
+	// In standard serialization we don't do anything
+	// Translation will be applied in handlers before calling json.Marshal
 
 	return json.Marshal(apodMap)
 }

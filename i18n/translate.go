@@ -7,105 +7,105 @@ import (
 	"strings"
 )
 
-// TranslationService define a interface para serviços de tradução
+// TranslationService defines the interface for translation services
 type TranslationService interface {
 	Translate(text, sourceLang, targetLang string) (string, error)
 }
 
-// mockTranslationService é uma implementação de simulação para desenvolvimento
+// mockTranslationService is a mock implementation for development
 type mockTranslationService struct{}
 
-// Translate na implementação de simulação apenas adiciona um indicador de idioma
+// Translate in the mock implementation just adds a language indicator
 func (s *mockTranslationService) Translate(text, sourceLang, targetLang string) (string, error) {
 	if len(text) > 100 {
-		// Para explicações longas, truncamos para simulação
-		return fmt.Sprintf("%s... [Traduzido para %s]", text[:100], targetLang), nil
+		// For long explanations, we truncate for simulation
+		return fmt.Sprintf("%s... [Translated to %s]", text[:100], targetLang), nil
 	}
 	return fmt.Sprintf("%s [%s]", text, targetLang), nil
 }
 
-// googleTranslationService seria uma implementação real usando a API do Google Translate
+// googleTranslationService would be a real implementation using the Google Translate API
 type googleTranslationService struct {
 	apiKey string
 }
 
-// Translate na implementação Google (esboço)
+// Translate in the Google implementation (sketch)
 func (s *googleTranslationService) Translate(text, sourceLang, targetLang string) (string, error) {
-	// Aqui estaria o código para chamar a API do Google Translate
-	// Por enquanto, apenas simulamos
-	log.Printf("Simulando tradução de '%s' do '%s' para '%s'",
+	// Here would be the code to call the Google Translate API
+	// For now, we just simulate
+	log.Printf("Simulating translation of '%s' from '%s' to '%s'",
 		truncateForLogging(text), sourceLang, targetLang)
 	return text + " [Google Translated]", nil
 }
 
-// deepLTranslationService seria uma implementação real usando a API DeepL
+// deepLTranslationService would be a real implementation using the DeepL API
 type deepLTranslationService struct {
 	apiKey string
 }
 
-// Translate na implementação DeepL (esboço)
+// Translate in the DeepL implementation (sketch)
 func (s *deepLTranslationService) Translate(text, sourceLang, targetLang string) (string, error) {
-	// Aqui estaria o código para chamar a API DeepL
-	// Por enquanto, apenas simulamos
-	log.Printf("Simulando tradução DeepL de '%s' do '%s' para '%s'",
+	// Here would be the code to call the DeepL API
+	// For now, we just simulate
+	log.Printf("Simulating DeepL translation of '%s' from '%s' to '%s'",
 		truncateForLogging(text), sourceLang, targetLang)
 	return text + " [DeepL Translated]", nil
 }
 
-// Serviço de tradução atual
+// Current translation service
 var currentService TranslationService
 
-// InitTranslationService inicializa o serviço de tradução apropriado
+// InitTranslationService initializes the appropriate translation service
 func InitTranslationService() {
-	// Verificar qual serviço usar com base em variáveis de ambiente
+	// Check which service to use based on environment variables
 	if apiKey := GoogleTranslateAPIKey(); apiKey != "" {
-		log.Println("Usando Google Translate para traduções")
+		log.Println("Using Google Translate for translations")
 		googleClient := NewGoogleTranslateClient(apiKey)
 
-		// Habilita cache Redis se disponível
+		// Enable Redis cache if available
 		if cache.Client != nil {
-			log.Println("Cache Redis habilitado para traduções")
+			log.Println("Redis cache enabled for translations")
 			googleClient.cache.EnableRedisCache()
 		}
 
 		currentService = googleClient
 	} else if apiKey := DeepLAPIKey(); apiKey != "" {
-		log.Println("Usando DeepL para traduções")
+		log.Println("Using DeepL for translations")
 		deepLClient := NewDeepLClient(apiKey)
 
-		// Habilita cache Redis se disponível
+		// Enable Redis cache if available
 		if cache.Client != nil {
-			log.Println("Cache Redis habilitado para traduções")
+			log.Println("Redis cache enabled for translations")
 			deepLClient.cache.EnableRedisCache()
 		}
 
 		currentService = deepLClient
 	} else {
-		log.Println("Nenhuma API de tradução configurada, usando simulação")
+		log.Println("No translation API configured, using mock service")
 		currentService = &mockTranslationService{}
 	}
 }
 
-// TranslateText traduz o texto para o idioma alvo
+// TranslateText translates the text to the target language
 func TranslateText(text, targetLang string) (string, error) {
 	if currentService == nil {
 		InitTranslationService()
 	}
 
-	// Se o idioma alvo for inglês ou vazio, não traduzimos
+	// If the target language is English or empty, we do not translate
 	if targetLang == "" || targetLang == "en" {
 		return text, nil
 	}
 
-	// Trunca texto muito longo (só para log, não para tradução real)
+	// Truncate very long text (just for logging, not for actual translation)
 	logText := truncateForLogging(text)
-	log.Printf("Traduzindo texto: '%s' para '%s'", logText, targetLang)
+	log.Printf("Translating text: '%s' to '%s'", logText, targetLang)
 
-	// Assumimos inglês como idioma fonte
+	// Assume English as the source language
 	return currentService.Translate(text, "en", targetLang)
 }
 
-// Método auxiliar para truncar texto longo nos logs
+// Helper method to truncate long text in logs
 func truncateForLogging(text string) string {
 	if len(text) > 50 {
 		return text[:50] + "..."
@@ -113,7 +113,7 @@ func truncateForLogging(text string) string {
 	return text
 }
 
-// TryTranslate tenta traduzir um texto, retornando o original em caso de erro
+// TryTranslate tries to translate a text, returning the original in case of error
 func TryTranslate(text string, targetLang string) string {
 	if targetLang == "en" || strings.TrimSpace(text) == "" {
 		return text
@@ -121,7 +121,7 @@ func TryTranslate(text string, targetLang string) string {
 
 	translated, err := TranslateText(text, targetLang)
 	if err != nil {
-		log.Printf("Erro ao traduzir texto: %v", err)
+		log.Printf("Error translating text: %v", err)
 		return text
 	}
 	return translated

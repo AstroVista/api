@@ -6,22 +6,22 @@ import (
 	"net/http"
 )
 
-// LanguageInfo contém informações sobre um idioma suportado
+// LanguageInfo contains information about a supported language
 type LanguageInfo struct {
 	Code       string `json:"code"`
 	Name       string `json:"name"`
 	NativeName string `json:"nativeName"`
 }
 
-// GetSupportedLanguages retorna a lista de idiomas suportados pela API
-// @Summary Lista idiomas suportados
-// @Description Retorna a lista de idiomas suportados pela API AstroVista
-// @Tags Configuração
+// GetSupportedLanguages returns the list of languages supported by the API
+// @Summary List supported languages
+// @Description Returns the list of languages supported by the AstroVista API
+// @Tags Configuration
 // @Accept json
 // @Produce json
 // @Success 200 {array} LanguageInfo
 // @Router /languages [get]
-func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Mapeia os códigos de idioma para seus nomes
+func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Maps language codes to their names
 	languageNames := map[string]map[string]string{
 		"en": {
 			"name":       "English",
@@ -49,7 +49,7 @@ func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Mapeia o
 		},
 	}
 
-	// Prepara a lista de idiomas suportados
+	// Prepare the list of supported languages
 	var languages []LanguageInfo
 
 	for _, lang := range i18n.SupportedLanguages {
@@ -68,7 +68,7 @@ func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Mapeia o
 		})
 	}
 
-	// Retorna a lista em formato JSON
+	// Return the list in JSON format
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(languages)
 }
