@@ -91,18 +91,17 @@ func SearchApods(w http.ResponseWriter, r *http.Request) {
 				}
 
 				translatedApods = append(translatedApods, apodMap)
-			}
-
-			// Cria uma resposta personalizada
+			}			// Cria uma resposta personalizada com campos padronizados
 			customResponse := map[string]interface{}{
-				"totalResults": translatedResponse.TotalResults,
-				"page":         translatedResponse.Page,
-				"perPage":      translatedResponse.PerPage,
-				"totalPages":   translatedResponse.TotalPages,
-				"results":      translatedApods,
+				"total_results": translatedResponse.TotalResults,
+				"page":          translatedResponse.Page,
+				"per_page":      translatedResponse.PerPage,
+				"total_pages":   translatedResponse.TotalPages,
+				"results":       translatedApods,
 			}
 
 			// Envia a versão traduzida
+			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(customResponse)
 		} else {
 			// Sem tradução, envia original

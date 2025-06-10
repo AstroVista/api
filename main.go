@@ -3,13 +3,12 @@ package main
 import (
 	"astrovista-api/cache"
 	"astrovista-api/database"
-	_ "astrovista-api/docs" // Importando docs para Swagger
+	_ "astrovista-api/docs" // Importing docs for Swagger
 	"astrovista-api/handlers"
 	"astrovista-api/i18n"
 	"astrovista-api/middleware"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -18,27 +17,32 @@ import (
 
 // @title           AstroVista API
 // @version         1.0
-// @description     API para gerenciar dados da NASA APOD (Astronomy Picture of the Day)
+// @description     API for managing NASA APOD (Astronomy Picture of the Day) data
 // @BasePath        /
 func main() {
-	// Inicializa conexões com banco de dados e cache
+	// Initialize database and cache connections
 	database.Connect()
 	cache.Connect()
-	// Inicializa sistema de internacionalização
+	// Initialize internationalization system
 	i18n.InitLocales()
 	i18n.InitTranslationService()
 
 	router := mux.NewRouter()
-
-	// Configuração do Swagger
+	// Swagger configuration
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("/swagger/doc.json"), // URL para acessar a documentação JSON
+		httpSwagger.URL("/swagger/doc.json"), // URL to access JSON documentation
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("list"),
 		httpSwagger.DomID("swagger-ui"),
 	))
 
-	// Endpoints GET públicos (sem limite de taxa)	// Adiciona middleware de detecção de idioma para todos os endpoints
+	// Redirect root route to Swagger documentation
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/", http.StatusFound)
+	})
+
+	// Public GET endpoints (no rate limit) // Add middleware for JSON formatting and language detection
+	router.Use(middleware.JSONFormatterMiddleware)
 	router.Use(middleware.LanguageDetector)
 	router.HandleFunc("/apod", handlers.GetApod).Methods("GET")
 	router.HandleFunc("/apod/{date}", handlers.GetApodDate).Methods("GET")
@@ -46,19 +50,15 @@ func main() {
 	router.HandleFunc("/apods/search", handlers.SearchApods).Methods("GET")
 	router.HandleFunc("/apods/date-range", handlers.GetApodsDateRange).Methods("GET")
 	router.HandleFunc("/languages", handlers.GetSupportedLanguages).Methods("GET")
-
-	// Rate limiter: 1 requisição por minuto
+	// Rate limiter: 1 request per minute
 	rateLimiter := middleware.NewRateLimiter(1, 1*time.Minute)
 
-	// Endpoint POST com limite de taxa aplicado
+	// POST endpoint with applied rate limit
 	postRouter := router.PathPrefix("/apod").Subrouter()
 	postRouter.Use(rateLimiter.Limit)
 	postRouter.HandleFunc("", handlers.PostApod).Methods("POST")
-	// Determina a porta do servidor (padrão 8080, ou usa variável de ambiente PORT)
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8081"
-	}
+	// Determine server port (default 8080, or use PORT environment variable)
+	port := "8080"
 
 	log.Printf("Server running on port %s!", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))

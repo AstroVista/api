@@ -12,55 +12,55 @@ import (
 )
 
 var (
-	// Bundle contém todas as mensagens traduzidas
+	// Bundle contains all translated messages
 	Bundle *i18n.Bundle
-	// Idiomas suportados pela API
+	// Languages supported by the API
 	SupportedLanguages = []string{"en", "pt-BR", "es", "fr", "de", "it"}
 )
 
-// InitLocales inicializa o sistema de internacionalização
+// InitLocales initializes the internationalization system
 func InitLocales() {
-	// Cria um novo bundle com inglês como idioma base
+	// Create a new bundle with English as the base language
 	Bundle = i18n.NewBundle(language.English)
 	Bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
-	// Carrega os arquivos de tradução
+	// Load translation files
 	if err := loadTranslationFiles(); err != nil {
-		log.Printf("Aviso: Falha ao carregar traduções: %v", err)
-		log.Println("API funcionará apenas com o idioma inglês")
+		log.Printf("Warning: Failed to load translations: %v", err)
+		log.Println("API will only work with English language")
 	}
 }
 
-// LoadTranslationFiles carrega os arquivos de tradução do diretório i18n/locales
+// LoadTranslationFiles loads translation files from the i18n/locales directory
 func loadTranslationFiles() error {
 	localesDir := filepath.Join("i18n", "locales")
-	// Verifica se o diretório existe
+	// Check if directory exists
 	if _, err := os.ReadDir(localesDir); err != nil {
-		// Se o diretório não existe, cria-o e adiciona arquivos padrão de tradução
+		// If directory doesn't exist, create it and add default translation files
 		if err := createDefaultTranslationFiles(localesDir); err != nil {
 			return err
 		}
 	}
 
-	// Carrega todos os arquivos de tradução
+	// Load all translation files
 	for _, lang := range SupportedLanguages {
 		filename := filepath.Join(localesDir, lang+".json")
 		if _, err := Bundle.LoadMessageFile(filename); err != nil {
-			log.Printf("Erro ao carregar tradução para %s: %v", lang, err)
+			log.Printf("Error loading translation for %s: %v", lang, err)
 		}
 	}
 
 	return nil
 }
 
-// createDefaultTranslationFiles cria os arquivos padrão de tradução se não existirem
+// createDefaultTranslationFiles creates default translation files if they don't exist
 func createDefaultTranslationFiles(localesDir string) error {
-	// Cria o diretório se não existir
+	// Create the directory if it doesn't exist
 	if err := os.MkdirAll(localesDir, 0755); err != nil {
 		return err
 	}
 
-	// Cria arquivos de tradução com conteúdo básico
+	// Create translation files with basic content
 	translations := map[string]map[string]string{
 		"en": {
 			"apod_title":        "Astronomy Picture of the Day",
@@ -87,18 +87,18 @@ func createDefaultTranslationFiles(localesDir string) error {
 	for lang, msgs := range translations {
 		filename := filepath.Join(localesDir, lang+".json")
 
-		// Converte para o formato esperado pelo go-i18n
+		// Convert to the format expected by go-i18n
 		i18nMsgs := make(map[string]map[string]string)
 		for id, msg := range msgs {
 			i18nMsgs[id] = map[string]string{"other": msg}
 		}
 
-		// Serializa para JSON
+		// Serialize to JSON
 		data, err := json.MarshalIndent(i18nMsgs, "", "  ")
 		if err != nil {
 			return err
 		}
-		// Escreve no arquivo
+		// Write to file
 		if err := os.WriteFile(filename, data, 0644); err != nil {
 			return err
 		}
@@ -107,14 +107,14 @@ func createDefaultTranslationFiles(localesDir string) error {
 	return nil
 }
 
-// Localizer retorna um localizer para o idioma especificado
+// Localizer returns a localizer for the specified language
 func Localizer(lang string) *i18n.Localizer {
-	// Se o idioma não for especificado ou não for suportado, usa inglês
+	// If language is not specified or not supported, use English
 	if lang == "" {
 		lang = "en"
 	}
 
-	// Verifica se o idioma é suportado
+	// Check if language is supported
 	supported := false
 	for _, supportedLang := range SupportedLanguages {
 		if strings.HasPrefix(lang, supportedLang) {
@@ -130,40 +130,40 @@ func Localizer(lang string) *i18n.Localizer {
 	return i18n.NewLocalizer(Bundle, lang, "en")
 }
 
-// TranslateAPOD traduz os campos do APOD para o idioma solicitado
+// TranslateAPOD translates APOD fields to the requested language
 func TranslateAPOD(apodData map[string]interface{}, lang string) error {
-	// Se não é um idioma suportado ou é inglês, retorna sem modificar
+	// If not a supported language or it's English, return without modifications
 	if lang == "" || lang == "en" {
 		return nil
 	}
 
-	// Inicializa o serviço de tradução se ainda não foi inicializado
+	// Initialize translation service if not yet initialized
 	if currentService == nil {
 		InitTranslationService()
 	}
 
-	// Traduz o título
+	// Translate title
 	if title, ok := apodData["title"].(string); ok && title != "" {
 		translatedTitle, err := TranslateText(title, lang)
 		if err == nil {
 			apodData["title"] = translatedTitle
 		} else {
-			log.Printf("Erro ao traduzir título: %v", err)
+			log.Printf("Error translating title: %v", err)
 		}
 	}
 
-	// Traduz a explicação
+	// Translate explanation
 	if explanation, ok := apodData["explanation"].(string); ok && explanation != "" {
 		translatedExplanation, err := TranslateText(explanation, lang)
 		if err == nil {
 			apodData["explanation"] = translatedExplanation
 		} else {
-			log.Printf("Erro ao traduzir explicação: %v", err)
+			log.Printf("Error translating explanation: %v", err)
 		}
 	}
 
-	// Outros campos podem ser traduzidos aqui se necessário
-	// Por exemplo, copyright, etc.
+	// Other fields can be translated here if necessary
+	// For example, copyright, etc.
 	if copyright, ok := apodData["copyright"].(string); ok && copyright != "" {
 		translatedCopyright, err := TranslateText(copyright, lang)
 		if err == nil {
@@ -174,7 +174,7 @@ func TranslateAPOD(apodData map[string]interface{}, lang string) error {
 	return nil
 }
 
-// Função auxiliar para obter o mínimo entre dois inteiros
+// Helper function to get the minimum between two integers
 func min(a, b int) int {
 	if a < b {
 		return a

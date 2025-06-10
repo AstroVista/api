@@ -6,42 +6,41 @@ import (
 	"strings"
 )
 
-// Chave de contexto para armazenar o idioma
+// Context key to store the language
 type langKey struct{}
 
-// LanguageDetector é um middleware que detecta o idioma preferido do usuário
-func LanguageDetector(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Obtém o idioma do header Accept-Language
+// LanguageDetector is a middleware that detects the user's preferred language
+func LanguageDetector(next http.Handler) http.Handler {	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get language from Accept-Language header
 		acceptLang := r.Header.Get("Accept-Language")
 
-		// Obtém o idioma da query string 'lang' (tem precedência sobre o header)
+		// Get language from 'lang' query string (takes precedence over header)
 		queryLang := r.URL.Query().Get("lang")
 		if queryLang != "" {
 			acceptLang = queryLang
 		}
 
-		// Extrai o código de idioma principal (por exemplo, "pt-BR" -> "pt")
-		lang := "en" // padrão
+		// Extract the main language code (e.g., "pt-BR" -> "pt")
+		lang := "en" // default
 		if acceptLang != "" {
 			parts := strings.Split(acceptLang, ",")
 			langParts := strings.Split(parts[0], ";") // Remove q-factor
 			lang = strings.TrimSpace(langParts[0])
 		}
 
-		// Armazena o idioma no contexto da requisição
+		// Store the language in the request context
 		ctx := context.WithValue(r.Context(), langKey{}, lang)
 
-		// Chama o próximo handler com o contexto atualizado
+		// Call the next handler with the updated context
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-// GetLanguageFromContext extrai o idioma do contexto da requisição
+// GetLanguageFromContext extracts the language from the request context
 func GetLanguageFromContext(ctx context.Context) string {
 	lang, ok := ctx.Value(langKey{}).(string)
 	if !ok {
-		return "en" // idioma padrão
+		return "en" // default language
 	}
 	return lang
 }

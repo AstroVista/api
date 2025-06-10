@@ -11,62 +11,59 @@ import (
 )
 
 var (
-	// Client é o cliente Redis compartilhado
+	// Client is the shared Redis client
 	Client *redis.Client
-	// DefaultExpiration é o tempo padrão de expiração para itens em cache (24 horas)
+	// DefaultExpiration is the default expiration time for cached items (24 hours)
 	DefaultExpiration = 24 * time.Hour
 )
 
-// Connect estabelece a conexão com o Redis
-func Connect() {
-	// Verifica se há um URL do Redis nas variáveis de ambiente (para uso em produção)
+// Connect establishes the Redis connection
+func Connect() {	// Check if there's a Redis URL in the environment variables (for production use)
 	redisURL := os.Getenv("REDIS_URL")
 
-	// Se não houver, usa um padrão para desenvolvimento local
+	// If not, use a default for local development
 	if redisURL == "" {
 		redisURL = "localhost:6379"
 	}
 
-	// Configuração do cliente Redis
-	Client = redis.NewClient(&redis.Options{
+	// Redis client configuration	Client = redis.NewClient(&redis.Options{
 		Addr:     redisURL,
-		Password: os.Getenv("REDIS_PASSWORD"), // Sem senha se não estiver definido
-		DB:       0,                           // Usar banco de dados 0
+		Password: os.Getenv("REDIS_PASSWORD"), // No password if not defined
+		DB:       0,                           // Use database 0
 	})
-	// Verifica se a conexão está funcionando
+	// Check if the connection is working
 	ctx := context.Background()
 	_, err := Client.Ping(ctx).Result()
 	if err != nil {
-		log.Printf("Aviso: Não foi possível conectar ao Redis: %v", err)
-		log.Println("O cache será desativado. Para ativar o cache, instale o Redis e execute-o em localhost:6379")
+		log.Printf("Warning: Could not connect to Redis: %v", err)
+		log.Println("Cache will be disabled. To enable caching, install Redis and run it on localhost:6379")
 		log.Println("A API continuará funcionando normalmente, mas sem o benefício do cache")
 		Client = nil
 		return
 	}
 
-	log.Println("Conexão com Redis estabelecida com sucesso")
+	log.Println("Redis connection established successfully")
 }
 
-// Set armazena um item no cache
+// Set stores an item in the cache
 func Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
 	if Client == nil {
-		return nil // Cache desativado
+		return nil // Cache disabled
 	}
 
-	// Convertendo para JSON
+	// Converting to JSON
 	data, err := json.Marshal(value)
 	if err != nil {
 		return err
 	}
-
-	// Armazenando no Redis
+	// Storing in Redis
 	return Client.Set(ctx, key, data, expiration).Err()
 }
 
-// Get recupera um item do cache
+// Get retrieves an item from the cache
 func Get(ctx context.Context, key string, dest interface{}) (bool, error) {
 	if Client == nil {
-		return false, nil // Cache desativado
+		return false, nil // Cache disabled
 	}
 
 	// Buscando do Redis

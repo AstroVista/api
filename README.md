@@ -1,131 +1,131 @@
 # AstroVista API
 
-API para gerenciar dados da NASA APOD (Astronomy Picture of the Day) com recursos avançados de documentação interativa, sistema de cache e suporte a múltiplos idiomas.
+API for managing NASA APOD (Astronomy Picture of the Day) data with advanced features including interactive documentation, cache system, and support for multiple languages.
 
-## Recursos
+## Features
 
--   **Documentação interativa** com Swagger/OpenAPI
--   **Sistema de cache** com Redis para melhor performance
--   **Internacionalização (i18n)** com suporte a múltiplos idiomas - Inglês (padrão)
-    -   Português do Brasil
-    -   Espanhol
-    -   Francês
-    -   Alemão
-    -   Italiano
-    -   Suporte para adicionar novos idiomas facilmente
+-   **Interactive documentation** with Swagger/OpenAPI
+-   **Cache system** with Redis for better performance
+-   **Internationalization (i18n)** with support for multiple languages - English (default)
+    -   Brazilian Portuguese
+    -   Spanish
+    -   French
+    -   German
+    -   Italian
+    -   Support for easily adding new languages
 
-## Configuração
+## Configuration
 
-### Requisitos
+### Requirements
 
--   Go 1.18 ou superior
--   MongoDB (para armazenamento de dados)
--   Redis (opcional, para cache)
+-   Go 1.18 or higher
+-   MongoDB (for data storage)
+-   Redis (optional, for caching)
 
-### Variáveis de ambiente
+### Environment Variables
 
--   `PORT` - Porta do servidor (padrão: 8081)
--   `MONGODB_URI` - URI de conexão com o MongoDB
--   `REDIS_URL` - URL do servidor Redis (opcional)
--   `REDIS_PASSWORD` - Senha do Redis (opcional)
--   `GOOGLE_TRANSLATE_API_KEY` - Chave da API do Google Translate (opcional)
--   `DEEPL_API_KEY` - Chave da API DeepL para traduções (opcional)
+-   `PORT` - Server port (default: 8081)
+-   `MONGODB_URI` - MongoDB connection URI
+-   `REDIS_URL` - Redis server URL (optional)
+-   `REDIS_PASSWORD` - Redis password (optional)
+-   `GOOGLE_TRANSLATE_API_KEY` - Google Translate API key (optional)
+-   `DEEPL_API_KEY` - DeepL API key for translations (optional)
 
-## Serviços de Tradução
+## Translation Services
 
-A API pode utilizar diferentes serviços de tradução:
+The API can use different translation services:
 
 ### Google Translate
 
-Para usar o Google Translate, você precisa:
+To use Google Translate, you need to:
 
-1. Criar uma conta no [Google Cloud Platform](https://cloud.google.com/)
-2. Criar um novo projeto
-3. Ativar a Cloud Translation API
-4. Criar uma chave de API
-5. Definir a variável de ambiente `GOOGLE_TRANSLATE_API_KEY`
+1. Create an account on [Google Cloud Platform](https://cloud.google.com/)
+2. Create a new project
+3. Enable the Cloud Translation API
+4. Create an API key
+5. Set the environment variable `GOOGLE_TRANSLATE_API_KEY`
 
 ```bash
-export GOOGLE_TRANSLATE_API_KEY="sua-chave-aqui"
+export GOOGLE_TRANSLATE_API_KEY="your-key-here"
 ```
 
 ### DeepL
 
-Para usar o DeepL, você precisa:
+To use DeepL, you need to:
 
-1. Criar uma conta no [DeepL API](https://www.deepl.com/pro-api)
-2. Obter sua chave de autenticação
-3. Definir a variável de ambiente `DEEPL_API_KEY`
+1. Create an account on [DeepL API](https://www.deepl.com/pro-api)
+2. Get your authentication key
+3. Set the environment variable `DEEPL_API_KEY`
 
 ```bash
-export DEEPL_API_KEY="sua-chave-aqui"
+export DEEPL_API_KEY="your-key-here"
 ```
 
-### Simulação (Mock)
+### Mock
 
-Se nenhuma chave de API for configurada, a API usará um serviço de tradução simulado para desenvolvimento.
+If no API key is configured, the API will use a mock translation service for development.
 
-## Sistema de Cache de Traduções
+## Translation Cache System
 
-Para melhorar a performance e evitar requisições repetidas às APIs de tradução, implementamos um sistema de cache em dois níveis:
+To improve performance and avoid repeated calls to translation APIs, we implemented a two-level cache system:
 
-1. **Cache em memória**: Armazena traduções recentes na memória para acesso rápido
-2. **Cache Redis**: Se o Redis estiver disponível, as traduções também são armazenadas de forma persistente
+1. **In-memory cache**: Stores recent translations in memory for quick access
+2. **Redis cache**: If Redis is available, translations are also stored persistently
 
-As traduções são armazenadas por 30 dias no cache Redis, reduzindo significativamente o número de chamadas às APIs externas.
+Translations are stored for 30 days in the Redis cache, significantly reducing the number of calls to external APIs.
 
-## Executando a API
+## Running the API
 
 ```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/astrovista-api.git
+# Clone the repository
+git clone https://github.com/your-username/astrovista-api.git
 cd astrovista-api
 
-# Instale as dependências
+# Install dependencies
 go get -u
 
-# Execute a API
+# Run the API
 go run main.go
 ```
 
 ## Endpoints
 
-### Documentação
+### Documentation
 
--   `/swagger/` - Documentação interativa Swagger
+-   `/swagger/` - Swagger interactive documentation
 
-### Principais endpoints
+### Main endpoints
 
--   `GET /apod` - Obtém o APOD mais recente
--   `GET /apod/{date}` - Obtém um APOD por data específica
--   `GET /apods` - Lista todos os APODs cadastrados
--   `GET /apods/search` - Pesquisa avançada com filtros
--   `GET /apods/date-range` - Busca APODs por intervalo de datas
--   `GET /languages` - Lista idiomas suportados
--   `POST /apod` - Adiciona um novo APOD
+-   `GET /apod` - Get the most recent APOD
+-   `GET /apod/{date}` - Get an APOD by specific date
+-   `GET /apods` - List all registered APODs
+-   `GET /apods/search` - Advanced search with filters
+-   `GET /apods/date-range` - Search APODs by date range
+-   `GET /languages` - List supported languages
+-   `POST /apod` - Add a new APOD
 
-## Suporte a idiomas
+## Language Support
 
-Para obter respostas em um idioma específico, você pode:
+To get responses in a specific language, you can:
 
-1. Enviar o cabeçalho `Accept-Language` na requisição
+1. Send the `Accept-Language` header in the request
 
     ```
     Accept-Language: pt-BR
     ```
 
-2. Ou adicionar o parâmetro `lang` na URL
+2. Or add the `lang` parameter in the URL
     ```
     /apod?lang=pt-BR
     ```
 
 ## Cache
 
-As respostas da API incluem o cabeçalho `X-Cache` para indicar se o resultado veio do cache:
+API responses include the `X-Cache` header to indicate if the result came from cache:
 
--   `X-Cache: HIT` - Resposta recuperada do cache
--   `X-Cache: MISS` - Resposta obtida do banco de dados
+-   `X-Cache: HIT` - Response retrieved from cache
+-   `X-Cache: MISS` - Response obtained from the database
 
-## Licença
+## License
 
 MIT

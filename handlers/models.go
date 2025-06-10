@@ -64,16 +64,16 @@ type ApodsDateRangeResponse struct {
 type SearchResponse struct {
 	// Número total de resultados encontrados
 	// example: 42
-	TotalResults int `json:"totalResults"`
+	TotalResults int `json:"total_results"` // Usando snake_case para consistência
 	// Número da página atual
 	// example: 1
 	Page int `json:"page"`
 	// Itens por página
 	// example: 20
-	PerPage int `json:"perPage"`
+	PerPage int `json:"per_page"` // Usando snake_case para consistência
 	// Total de páginas disponíveis
 	// example: 3
-	TotalPages int `json:"totalPages"`
+	TotalPages int `json:"total_pages"` // Usando snake_case para consistência
 	// Resultados da busca
 	Results []Apod `json:"results"`
 }

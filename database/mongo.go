@@ -13,11 +13,10 @@ import (
 
 var ApodCollection *mongo.Collection
 
-func Connect() {
-	// Load environment variables
+func Connect() {	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Erro ao carregar .env")
+		log.Println("Error loading .env file - using system environment variables")
 	}
 
 	mongoURI := os.Getenv("MONGODB_URI")
@@ -32,7 +31,6 @@ func Connect() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	ApodCollection = client.Database(dbName).Collection(collectionName)
-	log.Println("MongoDB conectado com sucesso.")
+	log.Println("MongoDB connected successfully.")
 }
