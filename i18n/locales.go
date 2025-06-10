@@ -15,7 +15,29 @@ var (
 	// Bundle contains all translated messages
 	Bundle *i18n.Bundle
 	// Languages supported by the API
-	SupportedLanguages = []string{"en", "pt-BR", "es", "fr", "de", "it"}
+	SupportedLanguages = []string{
+		"en",    // English
+		"es",    // Spanish
+		"de",    // German
+		"ja",    // Japanese
+		"fr",    // French
+		"ru",    // Russian
+		"pt-BR", // Portuguese (Brazil)
+		"it",    // Italian
+		"nl",    // Dutch/Flemish
+		"pl",    // Polish
+		"tr",    // Turkish
+		"fa",    // Persian
+		"zh",    // Chinese
+		"vi",    // Vietnamese
+		"id",    // Indonesian
+		"cs",    // Czech
+		"ko",    // Korean
+		"uk",    // Ukrainian
+		"hu",    // Hungarian
+		"ro",    // Romanian		"ar",     // Arabic
+		"sv",    // Swedish
+	}
 )
 
 // InitLocales initializes the internationalization system

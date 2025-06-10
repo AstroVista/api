@@ -21,7 +21,8 @@ type LanguageInfo struct {
 // @Produce json
 // @Success 200 {array} LanguageInfo
 // @Router /languages [get]
-func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Maps language codes to their names
+func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) {
+	// Maps language codes to their names
 	languageNames := map[string]map[string]string{
 		"en": {
 			"name":       "English",
@@ -46,6 +47,70 @@ func GetSupportedLanguages(w http.ResponseWriter, r *http.Request) { // Maps lan
 		"it": {
 			"name":       "Italian",
 			"nativeName": "Italiano",
+		},
+		"ja": {
+			"name":       "Japanese",
+			"nativeName": "日本語",
+		},
+		"ru": {
+			"name":       "Russian",
+			"nativeName": "Русский",
+		},
+		"nl": {
+			"name":       "Dutch/Flemish",
+			"nativeName": "Nederlands",
+		},
+		"pl": {
+			"name":       "Polish",
+			"nativeName": "Polski",
+		},
+		"tr": {
+			"name":       "Turkish",
+			"nativeName": "Türkçe",
+		},
+		"fa": {
+			"name":       "Persian",
+			"nativeName": "فارسی",
+		},
+		"zh": {
+			"name":       "Chinese",
+			"nativeName": "中文",
+		},
+		"vi": {
+			"name":       "Vietnamese",
+			"nativeName": "Tiếng Việt",
+		},
+		"id": {
+			"name":       "Indonesian",
+			"nativeName": "Bahasa Indonesia",
+		},
+		"cs": {
+			"name":       "Czech",
+			"nativeName": "Čeština",
+		},
+		"ko": {
+			"name":       "Korean",
+			"nativeName": "한국어",
+		},
+		"uk": {
+			"name":       "Ukrainian",
+			"nativeName": "Українська",
+		},
+		"hu": {
+			"name":       "Hungarian",
+			"nativeName": "Magyar",
+		},
+		"ro": {
+			"name":       "Romanian",
+			"nativeName": "Română",
+		},
+		"ar": {
+			"name":       "Arabic",
+			"nativeName": "العربية",
+		},
+		"sv": {
+			"name":       "Swedish",
+			"nativeName": "Svenska",
 		},
 	}
 

@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Hình Ảnh Thiên Văn của Ngày"
+	},
+	"apod_not_found": {
+		"other": "Không tìm thấy tài liệu! Vui lòng kiểm tra định dạng ngày (YYYY-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Không tìm thấy tài liệu nào phù hợp với tiêu chí tìm kiếm"
+	},
+	"general_error": {
+		"other": "Lỗi máy chủ. Vui lòng thử lại sau."
+	},
+	"invalid_date": {
+		"other": "Ngày không hợp lệ. Sử dụng định dạng YYYY-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Loại phương tiện không hợp lệ. Sử dụng 'image', 'video', hoặc 'any'."
+	},
+	"date_range_error": {
+		"other": "Lỗi phạm vi ngày. Ngày bắt đầu phải sớm hơn ngày kết thúc."
+	},
+	"cache_status_hit": {
+		"other": "Đã lưu trong bộ nhớ đệm"
+	},
+	"cache_status_miss": {
+		"other": "Không có trong bộ nhớ đệm"
+	}
+}

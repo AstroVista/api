@@ -18,7 +18,8 @@ var (
 )
 
 // Connect establishes the Redis connection
-func Connect() {	// Check if there's a Redis URL in the environment variables (for production use)
+func Connect() {
+	// Check if there's a Redis URL in the environment variables (for production use)
 	redisURL := os.Getenv("REDIS_URL")
 
 	// If not, use a default for local development
@@ -26,7 +27,8 @@ func Connect() {	// Check if there's a Redis URL in the environment variables (f
 		redisURL = "localhost:6379"
 	}
 
-	// Redis client configuration	Client = redis.NewClient(&redis.Options{
+	// Redis client configuration
+	Client = redis.NewClient(&redis.Options{
 		Addr:     redisURL,
 		Password: os.Getenv("REDIS_PASSWORD"), // No password if not defined
 		DB:       0,                           // Use database 0
@@ -37,7 +39,7 @@ func Connect() {	// Check if there's a Redis URL in the environment variables (f
 	if err != nil {
 		log.Printf("Warning: Could not connect to Redis: %v", err)
 		log.Println("Cache will be disabled. To enable caching, install Redis and run it on localhost:6379")
-		log.Println("A API continuará funcionando normalmente, mas sem o benefício do cache")
+		log.Println("The API will continue to function normally, but without the benefit of caching")
 		Client = nil
 		return
 	}

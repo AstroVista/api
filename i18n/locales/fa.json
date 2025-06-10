@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "تصویر نجومی روز"
+	},
+	"apod_not_found": {
+		"other": "سند پیدا نشد! لطفاً فرمت تاریخ (YYYY-MM-DD) را بررسی کنید."
+	},
+	"search_no_results": {
+		"other": "هیچ سندی مطابق با معیارهای جستجو یافت نشد"
+	},
+	"general_error": {
+		"other": "خطای سرور. لطفاً بعداً دوباره امتحان کنید."
+	},
+	"invalid_date": {
+		"other": "تاریخ نامعتبر. از فرمت YYYY-MM-DD استفاده کنید."
+	},
+	"invalid_media_type": {
+		"other": "نوع رسانه نامعتبر. از 'image'، 'video' یا 'any' استفاده کنید."
+	},
+	"date_range_error": {
+		"other": "خطای محدوده تاریخ. تاریخ شروع باید قبل از تاریخ پایان باشد."
+	},
+	"cache_status_hit": {
+		"other": "ذخیره شده"
+	},
+	"cache_status_miss": {
+		"other": "ذخیره نشده"
+	}
+}

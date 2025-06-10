@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Astronomische Foto van de Dag"
+	},
+	"apod_not_found": {
+		"other": "Document niet gevonden! Controleer het datumformaat (JJJJ-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Geen documenten gevonden die overeenkomen met de zoekcriteria"
+	},
+	"general_error": {
+		"other": "Serverfout. Probeer het later opnieuw."
+	},
+	"invalid_date": {
+		"other": "Ongeldige datum. Gebruik het formaat JJJJ-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Ongeldig mediatype. Gebruik 'image', 'video' of 'any'."
+	},
+	"date_range_error": {
+		"other": "Datumbereikfout. Startdatum moet eerder zijn dan einddatum."
+	},
+	"cache_status_hit": {
+		"other": "Gecachet"
+	},
+	"cache_status_miss": {
+		"other": "Niet gecachet"
+	}
+}

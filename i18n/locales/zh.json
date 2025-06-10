@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "每日天文图片"
+	},
+	"apod_not_found": {
+		"other": "未找到文档！请检查日期格式（YYYY-MM-DD）。"
+	},
+	"search_no_results": {
+		"other": "未找到符合搜索条件的文档"
+	},
+	"general_error": {
+		"other": "服务器错误。请稍后再试。"
+	},
+	"invalid_date": {
+		"other": "日期无效。请使用YYYY-MM-DD格式。"
+	},
+	"invalid_media_type": {
+		"other": "媒体类型无效。请使用'image'、'video'或'any'。"
+	},
+	"date_range_error": {
+		"other": "日期范围错误。开始日期必须早于结束日期。"
+	},
+	"cache_status_hit": {
+		"other": "已缓存"
+	},
+	"cache_status_miss": {
+		"other": "未缓存"
+	}
+}

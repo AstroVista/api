@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Dagens astronomiska bild"
+	},
+	"apod_not_found": {
+		"other": "Dokumentet hittades inte! Kontrollera datumformatet (ÅÅÅÅ-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Inga dokument hittades som matchar sökvillkoren"
+	},
+	"general_error": {
+		"other": "Serverfel. Försök igen senare."
+	},
+	"invalid_date": {
+		"other": "Ogiltigt datum. Använd formatet ÅÅÅÅ-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Ogiltig mediatyp. Använd 'image', 'video' eller 'any'."
+	},
+	"date_range_error": {
+		"other": "Datumintervalfel. Startdatum måste vara tidigare än slutdatum."
+	},
+	"cache_status_hit": {
+		"other": "Cachad"
+	},
+	"cache_status_miss": {
+		"other": "Inte cachad"
+	}
+}

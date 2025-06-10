@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/apod": {
             "get": {
-                "description": "Retorna a imagem astronômica do dia mais recente",
+                "description": "Returns the most recent Astronomy Picture of the Day",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "APOD"
                 ],
-                "summary": "Obtém o APOD mais recente",
+                "summary": "Get the most recent APOD",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -47,7 +47,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Busca na API da NASA o APOD mais recente e adiciona ao banco de dados",
+                "description": "Fetches the most recent APOD from NASA API and adds it to the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -57,11 +57,11 @@ const docTemplate = `{
                 "tags": [
                     "APOD"
                 ],
-                "summary": "Adiciona novo APOD da NASA",
+                "summary": "Adds new APOD from NASA",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Token de API interno",
+                        "description": "Internal API token",
                         "name": "X-API-Token",
                         "in": "header",
                         "required": true
@@ -103,7 +103,7 @@ const docTemplate = `{
         },
         "/apod/{date}": {
             "get": {
-                "description": "Retorna a imagem astronômica do dia para a data especificada",
+                "description": "Returns the astronomy picture of the day for the specified date",
                 "consumes": [
                     "application/json"
                 ],
@@ -113,12 +113,12 @@ const docTemplate = `{
                 "tags": [
                     "APOD"
                 ],
-                "summary": "Obtém um APOD por data específica",
+                "summary": "Gets an APOD by specific date",
                 "parameters": [
                     {
                         "type": "string",
                         "example": "\"2023-01-15\"",
-                        "description": "Data no formato YYYY-MM-DD",
+                        "description": "Date in YYYY-MM-DD format",
                         "name": "date",
                         "in": "path",
                         "required": true
@@ -132,7 +132,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Erro ao obter APOD",
+                        "description": "Error getting APOD",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -143,7 +143,7 @@ const docTemplate = `{
         },
         "/apods": {
             "get": {
-                "description": "Retorna todas as imagens astronômicas do dia cadastradas",
+                "description": "Returns all registered Astronomy Pictures of the Day",
                 "consumes": [
                     "application/json"
                 ],
@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "APODs"
                 ],
-                "summary": "Obtém todos os APODs",
+                "summary": "Get all APODs",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -180,7 +180,7 @@ const docTemplate = `{
         },
         "/apods/date-range": {
             "get": {
-                "description": "Retorna as imagens astronômicas do dia dentro de um intervalo de datas especificado",
+                "description": "Returns the Astronomy Pictures of the Day within a specified date range",
                 "consumes": [
                     "application/json"
                 ],
@@ -190,19 +190,19 @@ const docTemplate = `{
                 "tags": [
                     "APODs"
                 ],
-                "summary": "Obtém APODs por intervalo de datas",
+                "summary": "Get APODs by date range",
                 "parameters": [
                     {
                         "type": "string",
                         "example": "\"2023-01-01\"",
-                        "description": "Data de início (formato YYYY-MM-DD)",
+                        "description": "Start date (YYYY-MM-DD format)",
                         "name": "start",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "\"2023-01-31\"",
-                        "description": "Data de fim (formato YYYY-MM-DD)",
+                        "description": "End date (YYYY-MM-DD format)",
                         "name": "end",
                         "in": "query"
                     }
@@ -233,7 +233,7 @@ const docTemplate = `{
         },
         "/apods/search": {
             "get": {
-                "description": "Busca APODs com filtros, paginação e ordenação",
+                "description": "Search APODs with filters, pagination and sorting",
                 "consumes": [
                     "application/json"
                 ],
@@ -243,13 +243,13 @@ const docTemplate = `{
                 "tags": [
                     "APODs"
                 ],
-                "summary": "Pesquisa avançada de APODs",
+                "summary": "Advanced APOD search",
                 "parameters": [
                     {
                         "minimum": 1,
                         "type": "integer",
                         "example": 1,
-                        "description": "Número da página",
+                        "description": "Page number",
                         "name": "page",
                         "in": "query"
                     },
@@ -258,7 +258,7 @@ const docTemplate = `{
                         "minimum": 1,
                         "type": "integer",
                         "example": 20,
-                        "description": "Itens por página (1-200)",
+                        "description": "Items per page (1-200)",
                         "name": "perPage",
                         "in": "query"
                     },
@@ -270,28 +270,28 @@ const docTemplate = `{
                         ],
                         "type": "string",
                         "example": "image",
-                        "description": "Tipo de mídia (image, video ou any)",
+                        "description": "Media type (image, video or any)",
                         "name": "mediaType",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "example": "nebulosa",
-                        "description": "Texto para busca em título e explicação",
+                        "example": "nebula",
+                        "description": "Text to search in title and explanation",
                         "name": "search",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "2023-01-01",
-                        "description": "Data inicial (formato YYYY-MM-DD)",
+                        "description": "Start date (YYYY-MM-DD format)",
                         "name": "startDate",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "2023-01-31",
-                        "description": "Data final (formato YYYY-MM-DD)",
+                        "description": "End date (YYYY-MM-DD format)",
                         "name": "endDate",
                         "in": "query"
                     },
@@ -302,7 +302,7 @@ const docTemplate = `{
                         ],
                         "type": "string",
                         "example": "desc",
-                        "description": "Ordenação (asc ou desc)",
+                        "description": "Sort order (asc or desc)",
                         "name": "sort",
                         "in": "query"
                     }
@@ -330,6 +330,32 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/languages": {
+            "get": {
+                "description": "Returns the list of languages supported by the AstroVista API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuration"
+                ],
+                "summary": "List supported languages",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.LanguageInfo"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -337,14 +363,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "apods": {
-                    "description": "Lista de APODs",
+                    "description": "List of APODs",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Apod"
                     }
                 },
                 "count": {
-                    "description": "Número total de APODs encontrados\nexample: 15",
+                    "description": "Total number of APODs found\nexample: 15",
                     "type": "integer"
                 }
             }
@@ -353,35 +379,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "_id": {
-                    "description": "ID do MongoDB\nexample: 507f1f77bcf86cd799439011",
+                    "description": "MongoDB ID\nexample: 507f1f77bcf86cd799439011",
                     "type": "string"
                 },
                 "date": {
-                    "description": "Data no formato string (ex: \"1995-06-16\")\nexample: 2023-01-15\nformat: date",
+                    "description": "Date in string format (e.g. \"1995-06-16\")\nexample: 2023-01-15\nformat: date",
                     "type": "string"
                 },
                 "explanation": {
-                    "description": "Explicação da imagem astronômica do dia\nexample: Uma bela nebulosa capturada pelo telescópio Hubble",
+                    "description": "Explanation of the astronomy picture of the day\nexample: A beautiful nebula captured by the Hubble telescope",
                     "type": "string"
                 },
                 "hdurl": {
-                    "description": "URL da imagem em alta definição\nexample: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg\nformat: uri",
+                    "description": "URL of the high-definition image\nexample: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg\nformat: uri",
                     "type": "string"
                 },
                 "media_type": {
-                    "description": "Tipo de mídia (imagem ou vídeo)\nexample: image\nenum: image,video",
+                    "description": "Media type (image or video)\nexample: image\nenum: image,video",
                     "type": "string"
                 },
                 "service_version": {
-                    "description": "Versão do serviço da API\nexample: v1",
+                    "description": "API service version\nexample: v1",
                     "type": "string"
                 },
                 "title": {
-                    "description": "Título da imagem astronômica do dia\nexample: Galáxia de Andrômeda",
+                    "description": "Title of the astronomy picture of the day\nexample: Andromeda Galaxy",
                     "type": "string"
                 },
                 "url": {
-                    "description": "URL da imagem em resolução padrão\nexample: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg\nformat: uri",
+                    "description": "URL of the standard resolution image\nexample: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg\nformat: uri",
                     "type": "string"
                 }
             }
@@ -390,15 +416,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "apods": {
-                    "description": "Lista de APODs",
+                    "description": "List of APODs",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Apod"
                     }
                 },
                 "count": {
-                    "description": "Número total de APODs encontrados\nexample: 7",
+                    "description": "Total number of APODs found\nexample: 7",
                     "type": "integer"
+                }
+            }
+        },
+        "handlers.LanguageInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nativeName": {
+                    "type": "string"
                 }
             }
         },
@@ -406,26 +446,26 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "page": {
-                    "description": "Número da página atual\nexample: 1",
+                    "description": "Current page number\nexample: 1",
                     "type": "integer"
                 },
-                "perPage": {
-                    "description": "Itens por página\nexample: 20",
+                "per_page": {
+                    "description": "Items per page\nexample: 20",
                     "type": "integer"
                 },
                 "results": {
-                    "description": "Resultados da busca",
+                    "description": "Search results",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Apod"
                     }
                 },
-                "totalPages": {
-                    "description": "Total de páginas disponíveis\nexample: 3",
+                "total_pages": {
+                    "description": "Total number of available pages\nexample: 3",
                     "type": "integer"
                 },
-                "totalResults": {
-                    "description": "Número total de resultados encontrados\nexample: 42",
+                "total_results": {
+                    "description": "Total number of results found\nexample: 42",
                     "type": "integer"
                 }
             }
@@ -440,7 +480,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "AstroVista API",
-	Description:      "API para gerenciar dados da NASA APOD (Astronomy Picture of the Day)",
+	Description:      "API for managing NASA APOD (Astronomy Picture of the Day) data",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

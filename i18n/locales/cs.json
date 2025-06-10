@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Astronomický obrázek dne"
+	},
+	"apod_not_found": {
+		"other": "Dokument nebyl nalezen! Zkontrolujte formát data (RRRR-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Nebyly nalezeny žádné dokumenty odpovídající kritériím vyhledávání"
+	},
+	"general_error": {
+		"other": "Chyba serveru. Zkuste to prosím později."
+	},
+	"invalid_date": {
+		"other": "Neplatné datum. Použijte formát RRRR-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Neplatný typ média. Použijte 'image', 'video', nebo 'any'."
+	},
+	"date_range_error": {
+		"other": "Chyba rozsahu dat. Počáteční datum musí být dřívější než koncové datum."
+	},
+	"cache_status_hit": {
+		"other": "Uloženo v mezipaměti"
+	},
+	"cache_status_miss": {
+		"other": "Není uloženo v mezipaměti"
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "今日の天文学写真"
+	},
+	"apod_not_found": {
+		"other": "ドキュメントが見つかりません！日付形式（YYYY-MM-DD）を確認してください。"
+	},
+	"search_no_results": {
+		"other": "検索条件に一致するドキュメントが見つかりませんでした"
+	},
+	"general_error": {
+		"other": "サーバーエラー。後でもう一度お試しください。"
+	},
+	"invalid_date": {
+		"other": "無効な日付。YYYY-MM-DD形式を使用してください。"
+	},
+	"invalid_media_type": {
+		"other": "無効なメディアタイプ。'image'、'video'、または'any'を使用してください。"
+	},
+	"date_range_error": {
+		"other": "日付範囲エラー。開始日は終了日より前である必要があります。"
+	},
+	"cache_status_hit": {
+		"other": "キャッシュ済み"
+	},
+	"cache_status_miss": {
+		"other": "キャッシュなし"
+	}
+}

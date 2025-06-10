@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Gambar Astronomi Hari Ini"
+	},
+	"apod_not_found": {
+		"other": "Dokumen tidak ditemukan! Silakan periksa format tanggal (YYYY-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Tidak ada dokumen yang ditemukan yang sesuai dengan kriteria pencarian"
+	},
+	"general_error": {
+		"other": "Kesalahan server. Silakan coba lagi nanti."
+	},
+	"invalid_date": {
+		"other": "Tanggal tidak valid. Gunakan format YYYY-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Jenis media tidak valid. Gunakan 'image', 'video', atau 'any'."
+	},
+	"date_range_error": {
+		"other": "Kesalahan rentang tanggal. Tanggal mulai harus lebih awal dari tanggal akhir."
+	},
+	"cache_status_hit": {
+		"other": "Sudah di-cache"
+	},
+	"cache_status_miss": {
+		"other": "Belum di-cache"
+	}
+}

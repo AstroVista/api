@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "A nap csillagászati képe"
+	},
+	"apod_not_found": {
+		"other": "A dokumentum nem található! Kérjük, ellenőrizze a dátum formátumát (ÉÉÉÉ-HH-NN)."
+	},
+	"search_no_results": {
+		"other": "Nem található a keresési feltételeknek megfelelő dokumentum"
+	},
+	"general_error": {
+		"other": "Szerverhiba. Kérjük, próbálja újra később."
+	},
+	"invalid_date": {
+		"other": "Érvénytelen dátum. Használjon ÉÉÉÉ-HH-NN formátumot."
+	},
+	"invalid_media_type": {
+		"other": "Érvénytelen médiatípus. Használjon 'image', 'video' vagy 'any' értéket."
+	},
+	"date_range_error": {
+		"other": "Dátumtartomány hiba. A kezdő dátumnak korábbinak kell lennie a záró dátumnál."
+	},
+	"cache_status_hit": {
+		"other": "Gyorsítótárazva"
+	},
+	"cache_status_miss": {
+		"other": "Nincs gyorsítótárazva"
+	}
+}

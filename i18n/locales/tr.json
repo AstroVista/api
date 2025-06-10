@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Günün Astronomi Görüntüsü"
+	},
+	"apod_not_found": {
+		"other": "Belge bulunamadı! Lütfen tarih formatını kontrol edin (YYYY-AA-GG)."
+	},
+	"search_no_results": {
+		"other": "Arama kriterlerine uyan belge bulunamadı"
+	},
+	"general_error": {
+		"other": "Sunucu hatası. Lütfen daha sonra tekrar deneyin."
+	},
+	"invalid_date": {
+		"other": "Geçersiz tarih. YYYY-AA-GG formatını kullanın."
+	},
+	"invalid_media_type": {
+		"other": "Geçersiz medya türü. 'image', 'video' veya 'any' kullanın."
+	},
+	"date_range_error": {
+		"other": "Tarih aralığı hatası. Başlangıç tarihi bitiş tarihinden önce olmalıdır."
+	},
+	"cache_status_hit": {
+		"other": "Önbelleğe alınmış"
+	},
+	"cache_status_miss": {
+		"other": "Önbelleğe alınmamış"
+	}
+}

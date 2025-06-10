@@ -3,13 +3,13 @@ definitions:
   handlers.AllApodsResponse:
     properties:
       apods:
-        description: Lista de APODs
+        description: List of APODs
         items:
           $ref: '#/definitions/handlers.Apod'
         type: array
       count:
         description: |-
-          Número total de APODs encontrados
+          Total number of APODs found
           example: 15
         type: integer
     type: object
@@ -17,45 +17,45 @@ definitions:
     properties:
       _id:
         description: |-
-          ID do MongoDB
+          MongoDB ID
           example: 507f1f77bcf86cd799439011
         type: string
       date:
         description: |-
-          Data no formato string (ex: "1995-06-16")
+          Date in string format (e.g. "1995-06-16")
           example: 2023-01-15
           format: date
         type: string
       explanation:
         description: |-
-          Explicação da imagem astronômica do dia
-          example: Uma bela nebulosa capturada pelo telescópio Hubble
+          Explanation of the astronomy picture of the day
+          example: A beautiful nebula captured by the Hubble telescope
         type: string
       hdurl:
         description: |-
-          URL da imagem em alta definição
+          URL of the high-definition image
           example: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg
           format: uri
         type: string
       media_type:
         description: |-
-          Tipo de mídia (imagem ou vídeo)
+          Media type (image or video)
           example: image
           enum: image,video
         type: string
       service_version:
         description: |-
-          Versão do serviço da API
+          API service version
           example: v1
         type: string
       title:
         description: |-
-          Título da imagem astronômica do dia
-          example: Galáxia de Andrômeda
+          Title of the astronomy picture of the day
+          example: Andromeda Galaxy
         type: string
       url:
         description: |-
-          URL da imagem em resolução padrão
+          URL of the standard resolution image
           example: https://apod.nasa.gov/apod/image/2301/M31_HubbleSpitzerGendler_960.jpg
           format: uri
         type: string
@@ -63,47 +63,56 @@ definitions:
   handlers.ApodsDateRangeResponse:
     properties:
       apods:
-        description: Lista de APODs
+        description: List of APODs
         items:
           $ref: '#/definitions/handlers.Apod'
         type: array
       count:
         description: |-
-          Número total de APODs encontrados
+          Total number of APODs found
           example: 7
         type: integer
+    type: object
+  handlers.LanguageInfo:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      nativeName:
+        type: string
     type: object
   handlers.SearchResponse:
     properties:
       page:
         description: |-
-          Número da página atual
+          Current page number
           example: 1
         type: integer
-      perPage:
+      per_page:
         description: |-
-          Itens por página
+          Items per page
           example: 20
         type: integer
       results:
-        description: Resultados da busca
+        description: Search results
         items:
           $ref: '#/definitions/handlers.Apod'
         type: array
-      totalPages:
+      total_pages:
         description: |-
-          Total de páginas disponíveis
+          Total number of available pages
           example: 3
         type: integer
-      totalResults:
+      total_results:
         description: |-
-          Número total de resultados encontrados
+          Total number of results found
           example: 42
         type: integer
     type: object
 info:
   contact: {}
-  description: API para gerenciar dados da NASA APOD (Astronomy Picture of the Day)
+  description: API for managing NASA APOD (Astronomy Picture of the Day) data
   title: AstroVista API
   version: "1.0"
 paths:
@@ -111,7 +120,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retorna a imagem astronômica do dia mais recente
+      description: Returns the most recent Astronomy Picture of the Day
       produces:
       - application/json
       responses:
@@ -125,16 +134,15 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Obtém o APOD mais recente
+      summary: Get the most recent APOD
       tags:
       - APOD
     post:
       consumes:
       - application/json
-      description: Busca na API da NASA o APOD mais recente e adiciona ao banco de
-        dados
+      description: Fetches the most recent APOD from NASA API and adds it to the database
       parameters:
-      - description: Token de API interno
+      - description: Internal API token
         in: header
         name: X-API-Token
         required: true
@@ -163,16 +171,16 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Adiciona novo APOD da NASA
+      summary: Adds new APOD from NASA
       tags:
       - APOD
   /apod/{date}:
     get:
       consumes:
       - application/json
-      description: Retorna a imagem astronômica do dia para a data especificada
+      description: Returns the astronomy picture of the day for the specified date
       parameters:
-      - description: Data no formato YYYY-MM-DD
+      - description: Date in YYYY-MM-DD format
         example: '"2023-01-15"'
         in: path
         name: date
@@ -186,18 +194,18 @@ paths:
           schema:
             $ref: '#/definitions/handlers.Apod'
         "400":
-          description: Erro ao obter APOD
+          description: Error getting APOD
           schema:
             additionalProperties: true
             type: object
-      summary: Obtém um APOD por data específica
+      summary: Gets an APOD by specific date
       tags:
       - APOD
   /apods:
     get:
       consumes:
       - application/json
-      description: Retorna todas as imagens astronômicas do dia cadastradas
+      description: Returns all registered Astronomy Pictures of the Day
       produces:
       - application/json
       responses:
@@ -215,22 +223,22 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Obtém todos os APODs
+      summary: Get all APODs
       tags:
       - APODs
   /apods/date-range:
     get:
       consumes:
       - application/json
-      description: Retorna as imagens astronômicas do dia dentro de um intervalo de
-        datas especificado
+      description: Returns the Astronomy Pictures of the Day within a specified date
+        range
       parameters:
-      - description: Data de início (formato YYYY-MM-DD)
+      - description: Start date (YYYY-MM-DD format)
         example: '"2023-01-01"'
         in: query
         name: start
         type: string
-      - description: Data de fim (formato YYYY-MM-DD)
+      - description: End date (YYYY-MM-DD format)
         example: '"2023-01-31"'
         in: query
         name: end
@@ -252,29 +260,29 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Obtém APODs por intervalo de datas
+      summary: Get APODs by date range
       tags:
       - APODs
   /apods/search:
     get:
       consumes:
       - application/json
-      description: Busca APODs com filtros, paginação e ordenação
+      description: Search APODs with filters, pagination and sorting
       parameters:
-      - description: Número da página
+      - description: Page number
         example: 1
         in: query
         minimum: 1
         name: page
         type: integer
-      - description: Itens por página (1-200)
+      - description: Items per page (1-200)
         example: 20
         in: query
         maximum: 200
         minimum: 1
         name: perPage
         type: integer
-      - description: Tipo de mídia (image, video ou any)
+      - description: Media type (image, video or any)
         enum:
         - image
         - video
@@ -283,22 +291,22 @@ paths:
         in: query
         name: mediaType
         type: string
-      - description: Texto para busca em título e explicação
-        example: nebulosa
+      - description: Text to search in title and explanation
+        example: nebula
         in: query
         name: search
         type: string
-      - description: Data inicial (formato YYYY-MM-DD)
+      - description: Start date (YYYY-MM-DD format)
         example: "2023-01-01"
         in: query
         name: startDate
         type: string
-      - description: Data final (formato YYYY-MM-DD)
+      - description: End date (YYYY-MM-DD format)
         example: "2023-01-31"
         in: query
         name: endDate
         type: string
-      - description: Ordenação (asc ou desc)
+      - description: Sort order (asc or desc)
         enum:
         - asc
         - desc
@@ -323,7 +331,24 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Pesquisa avançada de APODs
+      summary: Advanced APOD search
       tags:
       - APODs
+  /languages:
+    get:
+      consumes:
+      - application/json
+      description: Returns the list of languages supported by the AstroVista API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.LanguageInfo'
+            type: array
+      summary: List supported languages
+      tags:
+      - Configuration
 swagger: "2.0"

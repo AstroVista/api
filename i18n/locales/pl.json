@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Astronomiczne Zdjęcie Dnia"
+	},
+	"apod_not_found": {
+		"other": "Nie znaleziono dokumentu! Proszę sprawdzić format daty (RRRR-MM-DD)."
+	},
+	"search_no_results": {
+		"other": "Nie znaleziono dokumentów spełniających kryteria wyszukiwania"
+	},
+	"general_error": {
+		"other": "Błąd serwera. Proszę spróbować ponownie później."
+	},
+	"invalid_date": {
+		"other": "Nieprawidłowa data. Użyj formatu RRRR-MM-DD."
+	},
+	"invalid_media_type": {
+		"other": "Nieprawidłowy typ mediów. Użyj 'image', 'video' lub 'any'."
+	},
+	"date_range_error": {
+		"other": "Błąd zakresu dat. Data początkowa musi być wcześniejsza niż data końcowa."
+	},
+	"cache_status_hit": {
+		"other": "Z pamięci podręcznej"
+	},
+	"cache_status_miss": {
+		"other": "Nie z pamięci podręcznej"
+	}
+}

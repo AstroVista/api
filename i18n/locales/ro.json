@@ -1,0 +1,29 @@
+{
+	"apod_title": {
+		"other": "Imaginea astronomică a zilei"
+	},
+	"apod_not_found": {
+		"other": "Document negăsit! Vă rugăm să verificați formatul datei (AAAA-LL-ZZ)."
+	},
+	"search_no_results": {
+		"other": "Nu au fost găsite documente care să îndeplinească criteriile de căutare"
+	},
+	"general_error": {
+		"other": "Eroare de server. Vă rugăm să încercați mai târziu."
+	},
+	"invalid_date": {
+		"other": "Dată invalidă. Utilizați formatul AAAA-LL-ZZ."
+	},
+	"invalid_media_type": {
+		"other": "Tip media invalid. Utilizați 'image', 'video', sau 'any'."
+	},
+	"date_range_error": {
+		"other": "Eroare de interval de date. Data de început trebuie să fie anterioară datei de sfârșit."
+	},
+	"cache_status_hit": {
+		"other": "În cache"
+	},
+	"cache_status_miss": {
+		"other": "Nu este în cache"
+	}
+}
