@@ -2,16 +2,16 @@ basePath: /
 definitions:
   handlers.AllApodsResponse:
     properties:
-      apods:
-        description: List of APODs
-        items:
-          $ref: '#/definitions/handlers.Apod'
-        type: array
       count:
         description: |-
           Total number of APODs found
           example: 15
         type: integer
+      items:
+        description: List of APODs
+        items:
+          $ref: '#/definitions/handlers.Apod'
+        type: array
     type: object
   handlers.Apod:
     properties:
@@ -62,16 +62,16 @@ definitions:
     type: object
   handlers.ApodsDateRangeResponse:
     properties:
-      apods:
-        description: List of APODs
-        items:
-          $ref: '#/definitions/handlers.Apod'
-        type: array
       count:
         description: |-
           Total number of APODs found
           example: 7
         type: integer
+      items:
+        description: List of APODs
+        items:
+          $ref: '#/definitions/handlers.Apod'
+        type: array
     type: object
   handlers.LanguageInfo:
     properties:

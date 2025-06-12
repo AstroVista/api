@@ -74,11 +74,14 @@ All responses are returned in JSON format with consistent structure:
 
 ```json
 {
-	"date": "2025-06-10",
+	"_id": "6847c55a5205b7b5dd0ef2a7",
 	"title": "Enceladus in True Color",
-	"explanation": "Do the oceans beneath...",
+	"date": "2025-06-10",
+	"hdurl": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
+	"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
 	"media_type": "image",
-	"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg"
+	"service_version": "v1",
+	"explanation": "Do the oceans beneath..."
 }
 ```
 
@@ -133,11 +136,14 @@ GET /apod?lang=ja
 
 ```json
 {
-	"date": "2025-06-10",
+	"_id": "6847c55a5205b7b5dd0ef2a7",
 	"title": "エンケラドゥスの真の姿",
-	"explanation": "土星の衛星エンケラドゥスの氷の下の海には生命が存在するのだろうか？...",
+	"date": "2025-06-10",
+	"hdurl": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
+	"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
 	"media_type": "image",
-	"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg"
+	"service_version": "v1",
+	"explanation": "土星の衛星エンケラドゥスの氷の下の海には生命が存在するのだろうか？..."
 }
 ```
 
@@ -165,11 +171,14 @@ GET /apod/2023-05-20?lang=fr
 
 ```json
 {
-	"date": "2023-05-20",
+	"_id": "6839c45b8291a3c6dd0ef1b5",
 	"title": "Le Système Solaire à l'Échelle",
-	"explanation": "Les planètes dans notre système solaire...",
+	"date": "2023-05-20",
+	"hdurl": "https://apod.nasa.gov/apod/image/2305/SolarSystem_Scale_2400.jpg",
+	"url": "https://apod.nasa.gov/apod/image/2305/SolarSystem_Scale_800.jpg",
 	"media_type": "image",
-	"url": "https://apod.nasa.gov/apod/image/2305/SolarSystem_Scale_2400.jpg"
+	"service_version": "v1",
+	"explanation": "Les planètes dans notre système solaire..."
 }
 ```
 
@@ -186,10 +195,14 @@ Lists all registered Astronomy Pictures of the Day.
 	"count": 120,
 	"items": [
 		{
-			"date": "2025-06-10",
+			"_id": "6847c55a5205b7b5dd0ef2a7",
 			"title": "Enceladus in True Color",
+			"date": "2025-06-10",
+			"hdurl": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
+			"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg",
 			"media_type": "image",
-			"url": "https://apod.nasa.gov/apod/image/2506/EnceladusTrue_Cassini_960.jpg"
+			"service_version": "v1",
+			"explanation": "Do the oceans beneath Saturn's moon Enceladus contain life?..."
 		}
 		// Additional items...
 	]
@@ -226,10 +239,14 @@ GET /apods/search?mediaType=image&search=galaxy&page=2&perPage=10
 	"total_pages": 5,
 	"results": [
 		{
-			"date": "2025-05-15",
+			"_id": "6823a45b2305c7b4ed0ef1c2",
 			"title": "Andromeda Galaxy in Ultraviolet",
+			"date": "2025-05-15",
+			"hdurl": "https://example.com/andromeda_hd.jpg",
+			"url": "https://example.com/andromeda.jpg",
 			"media_type": "image",
-			"url": "https://example.com/andromeda.jpg"
+			"service_version": "v1",
+			"explanation": "The Andromeda Galaxy, captured in ultraviolet light..."
 		}
 		// Additional results...
 	]
@@ -260,10 +277,14 @@ GET /apods/date-range?start=2025-01-01&end=2025-01-31
 	"count": 31,
 	"items": [
 		{
-			"date": "2025-01-31",
+			"_id": "6814b22a4105d7b5dd0ef1a9",
 			"title": "Jupiter's Great Red Spot",
+			"date": "2025-01-31",
+			"hdurl": "https://example.com/jupiter_hd.jpg",
+			"url": "https://example.com/jupiter.jpg",
 			"media_type": "image",
-			"url": "https://example.com/jupiter.jpg"
+			"service_version": "v1",
+			"explanation": "Jupiter's Great Red Spot is a persistent anticyclonic storm..."
 		}
 		// Additional items...
 	]

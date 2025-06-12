@@ -362,16 +362,16 @@ const docTemplate = `{
         "handlers.AllApodsResponse": {
             "type": "object",
             "properties": {
-                "apods": {
+                "count": {
+                    "description": "Total number of APODs found\nexample: 15",
+                    "type": "integer"
+                },
+                "items": {
                     "description": "List of APODs",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Apod"
                     }
-                },
-                "count": {
-                    "description": "Total number of APODs found\nexample: 15",
-                    "type": "integer"
                 }
             }
         },
@@ -415,16 +415,16 @@ const docTemplate = `{
         "handlers.ApodsDateRangeResponse": {
             "type": "object",
             "properties": {
-                "apods": {
+                "count": {
+                    "description": "Total number of APODs found\nexample: 7",
+                    "type": "integer"
+                },
+                "items": {
                     "description": "List of APODs",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.Apod"
                     }
-                },
-                "count": {
-                    "description": "Total number of APODs found\nexample: 7",
-                    "type": "integer"
                 }
             }
         },
